@@ -1,0 +1,96 @@
+#topBar{
+    background-color: #333333;
+}
+
+#topBar > QPushButton{
+    border: none;
+}
+
+#searchBar > QLineEdit{
+    border-radius: 6px;
+    border: 3px solid #337ab7;
+    border-right: none;
+    background-color: #336ca6;
+    padding-left: 5px;
+    color: #e7e7e7;
+    font-weight: bold;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+#searchBar > QPushButton{
+    /*border: none;*/
+    background-color: #336ca6;
+    border: 3px solid #337ab7;
+    border-left: none;
+    border-radius: 6px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+#menu, #settings{
+    background-color: #336ca6;
+}
+
+#menu > #projectBtn{
+    color: #204569;
+    font-size: 18px;
+    min-height: 80px;
+    border:none;
+    border-bottom: 2px solid #2c5c8d;
+    text-align: left;
+    padding-left: 40;
+}
+
+#buildBtn{
+    height: 30px;
+    border: none;
+    border-bottom: 2px solid #2c5c8d;
+    background-color: #2e6196;
+}
+
+#buildBtn > QLabel{
+    color: #ffffff;
+    text-align: left;
+    padding: 2px 0px 0px 10px;
+}
+
+#buildBtn > QPushButton:hover{
+    background-color: #337ab7;
+    border: none;
+    padding-top: 2px;
+    border-bottom: 2px solid #2c5c8d;
+}
+
+#revBtn{
+    height: 30px;
+    border: none;
+    border-bottom: 2px solid #2c5c8d;
+}
+#revBtn:hover{
+    background-color: #337ab7;
+    border: none;
+    border-bottom: 2px solid #2c5c8d;
+}
+
+#revBtn > QLabel{
+    color: #ffffff;
+    text-align: left;
+    padding: 2px 0px 0px 30px;
+}
+
+#menuButton{
+    color: #eff4f3;
+    border: none;
+}
+#menuButton:hover{
+    background-color: #49515e;
+}
+
+#overlay{
+    background-color: 0, 0, 0, 127;
+}
+
+#popup{
+    background-color: #ffffff;
+}
