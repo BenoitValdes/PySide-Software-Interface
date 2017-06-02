@@ -72,23 +72,24 @@ class IconButton(QtGui.QPushButton):
 """
 
 class ContainerWidget(QtGui.QWidget):
-    def __init__(self, parent, widget):
+    def __init__(self, parent):
         QtGui.QWidget.__init__(self, parent)
         self.button = QtGui.QPushButton("Close Overlay")
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         self.topLayout = QtGui.QHBoxLayout()
-        self.text = QtGui.QLabel("MyLabel")
-        self.close = IconButton("./icons/close.png", (30, 30, 30), (16, 16))
+        self.title = QtGui.QLabel("MyLabel")
+        self.title.setObjectName("title")
+        self.close = IconButton("./icons/close-1.png", getCssValue("title", "color")[1:])
 
         self.widgets = []
 
         self.contentLayout = QtGui.QStackedLayout()
-        self.widgets.append(widget)
+        self.widgets.append(QtGui.QWidget())
 
         self.setLayout(QtGui.QVBoxLayout())
-        self.topLayout.addWidget(self.text)
+        self.topLayout.addWidget(self.title)
         self.topLayout.addWidget(self.close)
         self.contentLayout.addWidget(self.widgets[-1])
         self.layout().addLayout(self.topLayout)
@@ -113,10 +114,13 @@ class ContainerWidget(QtGui.QWidget):
         self.contentLayout.addWidget(self.widgets[-1])
         self.contentLayout.setCurrentWidget(widget)
         self.widgets.pop(0)
+        self.title.setText(self.widgets[-1].widgetName)
+        self.adjustSize()
+        self.parent().setGoodPosition()
 
 
 class Overlay(QtGui.QWidget):
-    def __init__(self, parent, widget):
+    def __init__(self, parent):
         QtGui.QWidget.__init__(self, parent)
         palette = QtGui.QPalette(self.palette())
         palette.setColor(palette.Background, QtCore.Qt.transparent)
@@ -124,7 +128,7 @@ class Overlay(QtGui.QWidget):
 
         self.colours = getCssValue("overlay", "background-color")
 
-        self.widget = ContainerWidget(self, widget)
+        self.widget = ContainerWidget(self)
         self.widget.adjustSize()
         self.hide()
 
@@ -136,9 +140,7 @@ class Overlay(QtGui.QWidget):
         painter.end()
 
     def resizeEvent(self, event):
-        position_x = (self.parent().geometry().width()-self.widget.geometry().width())/2
-        position_y = (self.parent().geometry().height()-self.widget.geometry().height())/2
-        self.widget.move(position_x, position_y)
+        self.setGoodPosition()
         event.accept()
 
     def switchWidget(self, widget):
@@ -146,6 +148,11 @@ class Overlay(QtGui.QWidget):
 
     def mousePressEvent(self, QMouseEvent):
         self.hide()
+
+    def setGoodPosition(self):
+        position_x = (self.parent().geometry().width()-self.widget.geometry().width())/2
+        position_y = (self.parent().geometry().height()-self.widget.geometry().height())/2
+        self.widget.move(position_x, position_y)
 
 """
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -472,7 +479,7 @@ class Settings(QtGui.QWidget):
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 
 class PlaceHolder(QtGui.QWidget):
-    def __init__(self, color):
+    def __init__(self, color, name = ""):
         QtGui.QWidget.__init__(self)
         self.setMinimumSize(100, 100)
         css="""
@@ -481,6 +488,22 @@ class PlaceHolder(QtGui.QWidget):
         }
         """
         self.setStyleSheet(css)
+        self.widgetName = name
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+
+class ProjectPreference(QtGui.QWidget):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
+        self.setFixedSize(300, 300)
+        self.widgetName = "Project Preferences"
+        self.setLayout(QtGui.QVBoxLayout())
+        self.layout().addWidget(QtGui.QLabel("plop"))
 
     def paintEvent(self, event):
         opt = QtGui.QStyleOption()

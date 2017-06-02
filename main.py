@@ -17,8 +17,10 @@ class MainWindow(QtGui.QWidget):
         self.left_menu = ui.Menu()
         self.settings = ui.Settings()
         self.content_widget = QtGui.QStackedWidget()
+        self.content_widget.setObjectName("content")
         self.widgets = []
         self.widgets.append(ui.PlaceHolder("e6e6e6"))
+        self.projectSettings = ui.ProjectPreference()
 
         # Layout
         self.main_layout = QtGui.QVBoxLayout()
@@ -37,7 +39,7 @@ class MainWindow(QtGui.QWidget):
             self.content_widget.addWidget(widget)
 
         self.setLayout(self.main_layout)
-        self.overlay = ui.Overlay(self, ui.PlaceHolder("ffff00"))
+        self.overlay = ui.Overlay(self)
 
         # --- Connections ---------------------------------------------------------------------------------------------
         self.top_menu.menuBtn.clicked.connect(lambda: self.displayMenu(self.left_menu))
@@ -46,7 +48,7 @@ class MainWindow(QtGui.QWidget):
         self.top_menu.search.button.clicked.connect(self.searchSlot)
 
         # About menu
-        self.left_menu.projectButton.clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff0000")))
+        self.left_menu.projectButton.clicked.connect(lambda: self.displayOverlay(self.projectSettings))
         self.left_menu.buildBtn.addBtn.clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("FF00FF")))
 
         # self.left_menu.buttons[0].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
