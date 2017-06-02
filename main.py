@@ -72,8 +72,11 @@ class MainWindow(QtGui.QWidget):
         sender.setVisible(sender.state)
 
     def changeContent(self, widget):
-
-        self.content_widget.setCurrentWidget(index)
+        if not widget in self.widgets:
+            self.widgets.append(widget)
+            widget = self.widgets[-1]
+            self.content_widget.addWidget(widget)
+        self.content_widget.setCurrentWidget(widget)
 
     def displayOverlay(self, widget=False):
         if widget:
