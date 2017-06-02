@@ -58,14 +58,19 @@ class MainWindow(QtGui.QWidget):
         # self.left_menu.buttons[2].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
 
     def searchSlot(self):
-        # print self.sender().text()
+        currentRev = None
+        for rev in self.left_menu.menuItem:
+            if rev.active:
+                currentRev = rev.txt
+
         text = ""
         if isinstance(self.sender(), QtGui.QPushButton):
             text = self.sender().parent().input.text()
         elif isinstance(self.sender(), QtGui.QLineEdit):
             text = self.sender().text()
 
-        print text
+        searchWidget = ui.SearchResultWidget(currentRev, text)
+        self.changeContent(searchWidget)
 
     def displayMenu(self, sender):
         sender.state = not sender.state
