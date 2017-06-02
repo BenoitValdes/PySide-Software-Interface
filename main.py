@@ -9,15 +9,16 @@ class MainWindow(QtGui.QWidget):
         self.setStyleSheet(ui.css)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowTitle('QA Software')
-        # self.move(3200, 658)
+        self.move(3200, 658)
         self.resize(800, 500)
 
         # Widgets
         self.top_menu = ui.TopBar()
         self.left_menu = ui.Menu()
         self.settings = ui.Settings()
-        placeHolder1 = ui.PlaceHolder("e6e6e6")
-        placeHolder2 = ui.PlaceHolder("880000")
+        self.content_widget = QtGui.QStackedWidget()
+        self.widgets = []
+        self.widgets.append(ui.PlaceHolder("e6e6e6"))
 
         # Layout
         self.main_layout = QtGui.QVBoxLayout()
@@ -26,42 +27,53 @@ class MainWindow(QtGui.QWidget):
         self.core_layout = QtGui.QHBoxLayout()
         self.core_layout.setContentsMargins(0,0,0,0)
         self.core_layout.setSpacing(0)
-        self.content_layout = QtGui.QStackedLayout()
-        self.content_layout.setObjectName("content")
-        self.content_layout.setContentsMargins(0,0,0,0)
-        self.content_layout.setSpacing(0)
 
         self.main_layout.addWidget(self.top_menu)
         self.main_layout.addLayout(self.core_layout)
         self.core_layout.addWidget(self.left_menu)
-        self.core_layout.addLayout(self.content_layout)
+        self.core_layout.addWidget(self.content_widget)
         self.core_layout.addWidget(self.settings)
-        self.content_layout.addWidget(placeHolder1)
-        self.content_layout.addWidget(placeHolder2)
+        for widget in self.widgets:
+            self.content_widget.addWidget(widget)
 
         self.setLayout(self.main_layout)
         self.overlay = ui.Overlay(self, ui.PlaceHolder("ffff00"))
 
-        # Connections
+        # --- Connections ---------------------------------------------------------------------------------------------
         self.top_menu.menuBtn.clicked.connect(lambda: self.displayMenu(self.left_menu))
-        self.top_menu.settingsBtn.clicked.connect(lambda: self.displayMenu(self.settings))
+        # About search
+        self.top_menu.search.input.editingFinished.connect(self.searchSlot)
+        self.top_menu.search.button.clicked.connect(self.searchSlot)
 
-        self.left_menu.buttons[0].signal.clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
+        # About menu
+        self.left_menu.projectButton.clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff0000")))
+        self.left_menu.buildBtn.addBtn.clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("FF00FF")))
+
+        # self.left_menu.buttons[0].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
+        # self.left_menu.buttons[1].clicked.connect(lambda: self.changeContent(placeHolder1))
+        # self.left_menu.buttons[2].clicked.connect(lambda: self.changeContent(placeHolder2))
 
         # self.left_menu.buttons[0].clicked.connect(lambda: self.changeContent(0))
         # self.left_menu.buttons[1].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff0000")))
         # self.left_menu.buttons[2].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
 
-    @QtCore.Slot()
-    def plop(self, txt = "plop"):
-        print txt
+    def searchSlot(self):
+        # print self.sender().text()
+        text = ""
+        if isinstance(self.sender(), QtGui.QPushButton):
+            text = self.sender().parent().input.text()
+        elif isinstance(self.sender(), QtGui.QLineEdit):
+            text = self.sender().text()
+
+        print text
 
     def displayMenu(self, sender):
         sender.state = not sender.state
         sender.setVisible(sender.state)
 
-    def changeContent(self, index):
-        self.content_layout.setCurrentIndex(index)
+    def changeContent(self, widget):
+
+        self.content_widget.setCurrentWidget(index)
 
     def displayOverlay(self, widget=False):
         if widget:

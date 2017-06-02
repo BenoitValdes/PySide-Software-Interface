@@ -42,6 +42,10 @@
     padding-left: 40;
 }
 
+#menu > #projectBtn:hover{
+    background-color: #337ab7;
+}
+
 #buildBtn{
     height: 30px;
     border: none;
@@ -63,9 +67,12 @@
 }
 
 #revBtn{
-    height: 30px;
+    height: 25;
     border: none;
     border-bottom: 2px solid #2c5c8d;
+}
+#revBtn > #icon{
+    padding: 4px 6px 0px 0px;
 }
 #revBtn:hover{
     background-color: #337ab7;
@@ -79,12 +86,19 @@
     padding: 2px 0px 0px 30px;
 }
 
-#menuButton{
-    color: #eff4f3;
+#subMenuBtn{
+    color: #ffffff;
+    height: 20px;
+    font-size: 12px;
+    text-align: right;
+    background-color: #2e6196;
     border: none;
+    padding: 2px 40px 0px 0px;
+    border-bottom: 2px solid #2c5c8d;
 }
-#menuButton:hover{
-    background-color: #49515e;
+
+#subMenuBtn:hover{
+    background-color: #337ab7;
 }
 
 #overlay{

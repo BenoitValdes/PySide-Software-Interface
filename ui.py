@@ -28,18 +28,27 @@ def getCssValue(ids, attr = None, css = css):
     if content:
         return content
 
-class IconButton(QtGui.QPushButton):
-    def __init__(self, img, color = (255, 0, 0), size = None):
-        QtGui.QPushButton.__init__(self)
+
+class CustomSignal(QtCore.QObject):
+    clicked = QtCore.Signal()
+
+class CustomIcon(QtGui.QPixmap):
+    def __init__(self, img, color = (255, 255, 255), size = None):
         pix = QtGui.QPixmap(img)
         alpha =  pix.alphaChannel()
-        self.customIcon = QtGui.QPixmap(pix.size())
         if len(color) == 6:
             color = tuple(int(color[i:i+2], 16) for i in (0, 2 ,4))
 
-        self.customIcon.fill(QtGui.QColor(color[0], color[1], color[2]))
-        self.customIcon.setAlphaChannel(alpha)
-        self.setIcon(QtGui.QIcon(self.customIcon))
+        QtGui.QPixmap.__init__(self, pix.size())
+
+        self.fill(QtGui.QColor(color[0], color[1], color[2]))
+        self.setAlphaChannel(alpha)
+
+class IconButton(QtGui.QPushButton):
+    def __init__(self, img, color = (255, 0, 0), size = None):
+        QtGui.QPushButton.__init__(self)
+        pix = CustomIcon(img, color, size)
+        self.setIcon(QtGui.QIcon(pix))
         self.setFlat(True)
         if not size:
             size = (pix.width(), pix.height())
@@ -119,6 +128,9 @@ class Overlay(QtGui.QWidget):
     def switchWidget(self, widget):
         self.widget.replaceWidget(widget)
 
+    def mousePressEvent(self, QMouseEvent):
+        self.hide()
+
 class TopBar(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
@@ -188,23 +200,54 @@ class BuildButton(QtGui.QWidget):
         painter = QtGui.QPainter(self)
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 
-class CustomSignal(QtCore.QObject):
-    clicked = QtCore.Signal()
-
-class RevButton(QtGui.QWidget):
-    signal = CustomSignal()
+class SubMenuButton(QtGui.QWidget):
     def __init__(self, txt = "Clarisse 3.5"):
         QtGui.QWidget.__init__(self)
+        self.setLayout(QtGui.QVBoxLayout())
+        self.layout().setContentsMargins(0,0,0,0)
+        self.layout().setSpacing(0)
+        self.setCursor(QtCore.Qt.PointingHandCursor)
+        self.hide()
+
+        self.buttons = []
+        for name in ["UNIT TEST", "BUILD TEST", "BUILD TEST HD"]:
+            self.buttons.append(QtGui.QPushButton(name))
+            self.buttons[-1].setFlat(True)
+            self.buttons[-1].setObjectName("subMenuBtn")
+            self.layout().addWidget(self.buttons[-1])
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+class RevButton(QtGui.QWidget):
+    def __init__(self, txt = "Clarisse 3.5"):
+        QtGui.QWidget.__init__(self)
+        self.setFixedHeight(int(getCssValue("revBtn", "height")))
         self.setObjectName("revBtn")
+        self.setCursor(QtCore.Qt.PointingHandCursor)
+
+        # Signal
+        self.signal = CustomSignal()
+        self.clicked = self.signal.clicked
+        self.opened = False
+
+        # Widgets
+        self.label = QtGui.QLabel(txt)
+        self.icon = QtGui.QLabel("")
+        self.icon.setObjectName("icon")
+        self.openPix = CustomIcon("./icons/chevron-down.png", "ffffff", (30, 30))
+        self.closePix = CustomIcon("./icons/chevron-right.png", "ffffff", (30, 30))
+        self.icon.setPixmap(self.closePix)
+        self.icon.setAlignment(QtCore.Qt.AlignRight)
+
+        # Layout
         self.setLayout(QtGui.QHBoxLayout())
         self.layout().setContentsMargins(0,0,0,0)
-        self.label = QtGui.QLabel(txt)
-
-        self.addBtn = IconButton("./icons/chevron-right.png", "ffffff", (30, 30))
         self.layout().addWidget(self.label)
-        self.layout().addWidget(self.addBtn)
-
-        self.setCursor(QtCore.Qt.PointingHandCursor)
+        self.layout().addWidget(self.icon)
 
     def paintEvent(self, event):
         opt = QtGui.QStyleOption()
@@ -213,18 +256,47 @@ class RevButton(QtGui.QWidget):
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 
     def mousePressEvent(self, QMouseEvent):
-        print "clicked"
-        self.signal.clicked.emit()
+        self.clicked.emit()
+        if not self.opened:
+            self.opened = True
+            self.icon.setPixmap(self.openPix)
+        else:
+            self.opened = False
+            self.icon.setPixmap(self.closePix)
 
-    def connect(self, function):
-        # print function
-        pass
+class RevWidget(QtGui.QWidget):
+    def __init__(self, txt = "Rev XXXXXX"):
+        QtGui.QWidget.__init__(self)
+        self.setObjectName("revWidget")
+
+        self.revBtn = RevButton(txt)
+        self.submenu = SubMenuButton()
+
+        self.setLayout(QtGui.QVBoxLayout())
+        self.layout().setContentsMargins(0,0,0,0)
+        self.layout().setSpacing(0)
+        self.layout().addWidget(self.revBtn)
+        self.layout().addWidget(self.submenu)
+
+        self.revBtn.clicked.connect(self.displaySubMenu)
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+    def displaySubMenu(self):
+        if not self.revBtn.opened:
+            self.submenu.show()
+        else:
+            self.submenu.hide()
+
 
 class Menu(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
         self.state = True
-        self.setVisible(self.state)
         self.setObjectName("menu")
         self.setFixedWidth(200)
 
@@ -240,12 +312,12 @@ class Menu(QtGui.QWidget):
         self.layout().addWidget(self.projectButton)
 
         # The Build Button
-        self.projectButton = BuildButton()
-        self.layout().addWidget(self.projectButton)
+        self.buildBtn = BuildButton()
+        self.layout().addWidget(self.buildBtn)
 
         self.buttons = []
         for i in range(3):
-            self.buttons.append(RevButton("Rev 2145"+str(i+1)))
+            self.buttons.append(RevWidget("Rev 2145"+str(i+1)))
             self.layout().addWidget(self.buttons[-1])
 
         self.layout().addItem(QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
@@ -291,3 +363,65 @@ class PlaceHolder(QtGui.QWidget):
         painter = QtGui.QPainter(self)
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 
+
+
+class BTWidget(QtGui.QWidget):
+    def __init__(self, name):
+        QtGui.QWidget.__init__(self)
+        self.setMinimumSize(100, 100)
+        self.name = name
+        css="""
+        QWidget{
+            background-color: #ff0000;
+        }
+        """
+        self.setStyleSheet(css)
+        self.setLayout(QtGui.QHBoxLayout())
+        self.layout().addWidget(QtGui.QLabel(self.name+" - BUILD TEST"))
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+class BTHDWidget(QtGui.QWidget):
+    def __init__(self, name):
+        QtGui.QWidget.__init__(self)
+        self.setMinimumSize(100, 100)
+        self.name = name
+        css="""
+        QWidget{
+            background-color: #ff0000;
+        }
+        """
+        self.setStyleSheet(css)
+        self.setLayout(QtGui.QHBoxLayout())
+        self.layout().addWidget(QtGui.QLabel(self.name+" - BUILD TEST HD"))
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+
+class UTWidget(QtGui.QWidget):
+    def __init__(self, name):
+        QtGui.QWidget.__init__(self)
+        self.setMinimumSize(100, 100)
+        self.name = name
+        css="""
+        QWidget{
+            background-color: #ff0000;
+        }
+        """
+        self.setStyleSheet(css)
+        self.setLayout(QtGui.QHBoxLayout())
+        self.layout().addWidget(QtGui.QLabel(self.name+" - UNIT TEST"))
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)

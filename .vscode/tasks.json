@@ -1,0 +1,27 @@
+{
+    "version": "0.1.0",
+    // "echoCommand": true,
+    "_runner": "terminal",
+    "tasks": [
+        {
+            "taskName": "QA Software",
+            "isBuildCommand": true,
+            "command": "python",
+            "args": [
+                "${workspaceRoot}/main.py"
+            ],
+            "isShellCommand": true,
+            "showOutput": "always"
+        },
+        {
+            "taskName": "Current File",
+            "isBuildCommand": true,
+            "command": "python",
+            "args": [
+                "${file}"
+            ],
+            "isShellCommand": true,
+            "showOutput": "always"
+        }
+    ]
+}
