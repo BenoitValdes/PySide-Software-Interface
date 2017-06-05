@@ -65,6 +65,35 @@ class IconButton(QtGui.QPushButton):
         self.setFixedSize(size[0], size[1])
         self.setCursor(QtCore.Qt.PointingHandCursor)
 
+class ScrollWidget(QtGui.QScrollArea):
+    def __init__(self):
+        QtGui.QScrollArea.__init__(self)
+
+        self.setWidgetResizable(True)
+        self.scrollContent = QtGui.QWidget(self)
+
+        self.scrollLayout = QtGui.QVBoxLayout(self.scrollContent)
+        self.scrollLayout.setContentsMargins(0, 0, 0, 0)
+        self.scrollLayout.setSpacing(0)
+        self.scrollContent.setLayout(self.scrollLayout)
+        self.setWidget(self.scrollContent)
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+class PaintedWidget(QtGui.QWidget):
+    def __init__(self, parent, objectName):
+        QtGui.QWidget.__init__(self, parent)
+        self.setObjectName(objectName)
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 """
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---- Overlay/Popup
@@ -146,7 +175,7 @@ class Overlay(QtGui.QWidget):
     def switchWidget(self, widget):
         self.widget.replaceWidget(widget)
 
-        # Set main window minimum height depending on the content of the overlay
+        # Set main window minimum size depending on the content of the overlay
         width = self.widget.width()
         height = self.widget.height()
         self.parent().setMinimumSize(width+50, height+50)
@@ -342,7 +371,7 @@ class RevWidget(QtGui.QWidget):
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 
     def slot(self):
-        self.parent().displaySubmenu(self)
+        self.window().left_menu.displaySubmenu(self)
 
     def activate(self, state):
         self.active = state
@@ -375,12 +404,24 @@ class Menu(QtGui.QWidget):
         self.buildBtn = BuildButton()
         self.layout().addWidget(self.buildBtn)
 
-        self.menuItem = []
-        for i in range(3):
-            self.menuItem.append(RevWidget("Rev 2145"+str(i+1)))
-            self.layout().addWidget(self.menuItem[-1])
+        # The Rev Buttons (inside a scroll Area)
+        self.scrollArea = QtGui.QScrollArea()
+        self.scrollArea.setWidgetResizable(True)
+        self.content = PaintedWidget(self.scrollArea, "menu")
+        self.scrollLayout = QtGui.QVBoxLayout(self.content)
+        self.scrollLayout.setContentsMargins(0, 0, 0, 0)
+        self.scrollLayout.setSpacing(0)
 
-        self.layout().addItem(QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+        self.menuItem = []
+        for i in range(17):
+            self.menuItem.append(RevWidget("Rev 2145"+str(i+1)))
+            self.scrollLayout.addWidget(self.menuItem[-1])
+
+        self.scrollLayout.addItem(QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
+        self.layout().addWidget(self.scrollArea)
+        self.content.setLayout(self.scrollLayout)
+        self.scrollArea.setWidget(self.content)
 
     def paintEvent(self, event):
         opt = QtGui.QStyleOption()

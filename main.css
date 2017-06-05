@@ -40,6 +40,7 @@
     border-bottom: 2px solid #2c5c8d;
     text-align: left;
     padding-left: 40;
+    border-right: 2px solid #2c5c8d;
 }
 
 #menu > #projectBtn:hover{
@@ -51,6 +52,7 @@
     border: none;
     border-bottom: 2px solid #2c5c8d;
     background-color: #2e6196;
+    border-right: 2px solid #2c5c8d;
 }
 
 #buildBtn > QLabel{
@@ -62,8 +64,10 @@
 #buildBtn > QPushButton:hover{
     background-color: #337ab7;
     border: none;
-    padding-top: 2px;
+    padding-bottom: -2px;
+    padding-right: -2px;
     border-bottom: 2px solid #2c5c8d;
+    border-right: 2px solid #2c5c8d;
 }
 
 #revBtn{
@@ -118,3 +122,27 @@
 #content > QWidget{
     background-color: #e6e6e6;
 }
+
+QScrollArea{
+    border:none;
+}
+
+QWidget > QScrollBar::add-page:vertical, QWidget > QScrollBar::sub-page:vertical {
+    background: none;
+}
+QWidget > QScrollBar::sub-page:vertical, QWidget > QScrollBar::add-page:vertical {
+    background: #336ca6;
+    border-left: 2px solid #2c5c8d;
+    border-right: 2px solid #2c5c8d;
+}
+QWidget > QScrollBar:vertical {
+    border: none;
+    margin: 0px 0px 0px 0px;
+    width: 15px;
+ }
+ QWidget > QScrollBar::handle:vertical {
+    border: 2px solid #2c5c8d;
+    background: #2c5c8d;
+    min-height: 15px;
+    width: 11px;
+ }
