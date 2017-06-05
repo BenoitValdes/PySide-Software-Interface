@@ -146,8 +146,14 @@ class Overlay(QtGui.QWidget):
     def switchWidget(self, widget):
         self.widget.replaceWidget(widget)
 
+        # Set main window minimum height depending on the content of the overlay
+        width = self.widget.width()
+        height = self.widget.height()
+        self.parent().setMinimumSize(width+50, height+50)
+
     def mousePressEvent(self, QMouseEvent):
-        self.hide()
+        if not self.widget.underMouse():
+            self.hide()
 
     def setGoodPosition(self):
         position_x = (self.parent().geometry().width()-self.widget.geometry().width())/2
