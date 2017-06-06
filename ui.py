@@ -65,25 +65,6 @@ class IconButton(QtGui.QPushButton):
         self.setFixedSize(size[0], size[1])
         self.setCursor(QtCore.Qt.PointingHandCursor)
 
-class ScrollWidget(QtGui.QScrollArea):
-    def __init__(self):
-        QtGui.QScrollArea.__init__(self)
-
-        self.setWidgetResizable(True)
-        self.scrollContent = QtGui.QWidget(self)
-
-        self.scrollLayout = QtGui.QVBoxLayout(self.scrollContent)
-        self.scrollLayout.setContentsMargins(0, 0, 0, 0)
-        self.scrollLayout.setSpacing(0)
-        self.scrollContent.setLayout(self.scrollLayout)
-        self.setWidget(self.scrollContent)
-
-    def paintEvent(self, event):
-        opt = QtGui.QStyleOption()
-        opt.initFrom(self)
-        painter = QtGui.QPainter(self)
-        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
-
 class PaintedWidget(QtGui.QWidget):
     def __init__(self, parent, objectName):
         QtGui.QWidget.__init__(self, parent)
@@ -94,6 +75,26 @@ class PaintedWidget(QtGui.QWidget):
         opt.initFrom(self)
         painter = QtGui.QPainter(self)
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+class FlatButton(QtGui.QPushButton):
+    def __init__(self, txt):
+        QtGui.QPushButton.__init__(self, txt)
+        self.setObjectName("button")
+        self.setFlat(True)
+        self.setCursor(QtCore.Qt.PointingHandCursor)
+
+class UnitTestCategory(QtGui.QWidget):
+    def __init__(self, infos):
+        QtGui.QWidget.__init__(self)
+        self.setLayout(QtGui.QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
+        self.header = PaintedWidget(None, "utCategory")
+        self.header.setLayout(QtGui.QHBoxLayout())
+        self.header.layout().setContentsMargins(10, 0, 10, 0)
+        self.header.layout().addWidget(QtGui.QLabel(infos["rev"]+" - Unit Test"))
+
+        self.layout().addWidget(self.header)
 """
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---- Overlay/Popup
@@ -209,7 +210,8 @@ class TopBar(QtGui.QWidget):
         self.layout().setContentsMargins(10,0,10,0)
         self.layout().addWidget(self.menuBtn)
         self.layout().addWidget(self.search)
-        self.layout().addWidget(self.settingsBtn)
+        self.layout().addWidget(QtGui.QLabel(""))
+        # self.layout().addWidget(self.settingsBtn)
 
     def paintEvent(self, event):
         opt = QtGui.QStyleOption()
@@ -413,7 +415,7 @@ class Menu(QtGui.QWidget):
         self.scrollLayout.setSpacing(0)
 
         self.menuItem = []
-        for i in range(17):
+        for i in range(3):
             self.menuItem.append(RevWidget("Rev 2145"+str(i+1)))
             self.scrollLayout.addWidget(self.menuItem[-1])
 
@@ -476,7 +478,9 @@ class UTWidget(QtGui.QWidget):
 
 
         self.setLayout(QtGui.QHBoxLayout())
-        self.layout().addWidget(QtGui.QLabel(self.name+" - UNIT TEST"))
+        self.layout().addWidget(UnitTestCategory({"rev":self.name}))
+
+
 
     def paintEvent(self, event):
         opt = QtGui.QStyleOption()
@@ -543,14 +547,49 @@ class PlaceHolder(QtGui.QWidget):
         painter = QtGui.QPainter(self)
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 
-
 class ProjectPreference(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
-        self.setFixedSize(300, 300)
+        self.setObjectName("projectPrefs")
+        # self.setFixedSize(300, 300)
+        self.setMinimumWidth(500)
         self.widgetName = "Project Preferences"
+
+        # Widgets
+        itemDelegate = QtGui.QStyledItemDelegate()
+
+        loadLabel = QtGui.QLabel("Load existing project")
+        loadList = QtGui.QComboBox()
+        loadList.setStyle(QtGui.QStyleFactory.create("Windows"))
+        loadList.setItemDelegate(itemDelegate)
+        for i in range(42):
+            loadList.addItem("plop")
+        loadButton = FlatButton("Load")
+        loadButton.setMaximumWidth(100)
+
+        createLabel = QtGui.QLabel("Create new project")
+        createList = QtGui.QComboBox()
+        createList.setStyle(QtGui.QStyleFactory.create("Windows"))
+        createList.setItemDelegate(itemDelegate)
+        for i in range(42):
+            createList.addItem("plop")
+        createButton = FlatButton("Create")
+        createButton.setMaximumWidth(100)
+
+        # Layouts
         self.setLayout(QtGui.QVBoxLayout())
-        self.layout().addWidget(QtGui.QLabel("plop"))
+        loadLayout = QtGui.QHBoxLayout()
+        createLayout = QtGui.QHBoxLayout()
+
+        loadLayout.addWidget(loadList)
+        loadLayout.addWidget(loadButton)
+        createLayout.addWidget(createList)
+        createLayout.addWidget(createButton)
+
+        self.layout().addWidget(loadLabel)
+        self.layout().addLayout(loadLayout)
+        self.layout().addWidget(createLabel)
+        self.layout().addLayout(createLayout)
 
     def paintEvent(self, event):
         opt = QtGui.QStyleOption()

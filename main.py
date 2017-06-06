@@ -7,9 +7,9 @@ class MainWindow(QtGui.QWidget):
         # Window Config
         self.setObjectName("mainWindow")
         self.setStyleSheet(ui.css)
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowTitle('QA Software')
-        self.move(3200, 658)
+        # self.move(3200, 658)
         self.resize(800, 500)
 
         # Widgets
@@ -49,7 +49,7 @@ class MainWindow(QtGui.QWidget):
 
         # About menu
         self.left_menu.projectButton.clicked.connect(lambda: self.displayOverlay(self.projectSettings))
-        self.left_menu.buildBtn.addBtn.clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("FF00FF")))
+        self.left_menu.buildBtn.addBtn.clicked.connect(self.addRev)
 
         # self.left_menu.buttons[0].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
         # self.left_menu.buttons[1].clicked.connect(lambda: self.changeContent(placeHolder1))
@@ -58,6 +58,10 @@ class MainWindow(QtGui.QWidget):
         # self.left_menu.buttons[0].clicked.connect(lambda: self.changeContent(0))
         # self.left_menu.buttons[1].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff0000")))
         # self.left_menu.buttons[2].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
+
+    def addRev(self):
+        dialog = QtGui.QFileDialog()
+        print dialog.getOpenFileName()
 
     def searchSlot(self):
         currentRev = None

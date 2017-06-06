@@ -30,6 +30,7 @@
 
 #menu, #settings{
     background-color: #336ca6;
+    border-right: 2px solid #2c5c8d;
 }
 
 #menu > #projectBtn{
@@ -123,6 +124,81 @@
     background-color: #e6e6e6;
 }
 
+#utCategory{
+    background-color: #fcf8e3;
+    max-height: 30px;
+    border-radius: 6px;
+}
+
+#button{
+    border: 0px solid black;
+    background-color: #449d44;
+    height: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 3px;
+    color: #e7e7e7;
+
+}
+
+#button:hover{
+    background-color: #3e8f3e;
+
+}
+
+#projectPrefs QLabel{
+    color: #4d4d4d;
+    font-weight: bold;
+    font-size: 16px;
+    /*text-decoration: underline;*/
+}
+
+
+
+
+QComboBox {
+    border: 0px solid #336ca6;
+    border-radius: 3px;
+    height: 30px;
+    font-weight: bold;
+    color: #e7e7e7;
+    min-width: 120px;
+    background: #336ca6;
+    padding-left: 10px;
+}
+QComboBox:on {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+QComboBox::drop-down {
+    image: url(icons/chevron-down-white.png);
+    border: none;
+    /*background: white;*/
+    width: 30px;
+    border-radius: 3px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+QComboBox QAbstractItemView{
+    border: none;
+    outline:none;
+    background-color: #336ca6;
+    color: #e7e7e7;
+    /*margin-left: 10px;*/
+
+}
+QComboBox QAbstractItemView::item {
+    border-right: 2px solid #2c5c8d;
+    height: 30px;
+    padding-left: 8px;
+}
+QComboBox QAbstractItemView::item:selected {
+    background-color: #337ab7;
+}
+
+
 QScrollArea{
     border:none;
 }
@@ -132,7 +208,6 @@ QWidget > QScrollBar::add-page:vertical, QWidget > QScrollBar::sub-page:vertical
 }
 QWidget > QScrollBar::sub-page:vertical, QWidget > QScrollBar::add-page:vertical {
     background: #336ca6;
-    border-left: 2px solid #2c5c8d;
     border-right: 2px solid #2c5c8d;
 }
 QWidget > QScrollBar:vertical {
