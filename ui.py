@@ -349,11 +349,13 @@ class SubMenuButton(QtGui.QWidget):
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 
 class RevWidget(QtGui.QWidget):
-    def __init__(self, txt = "Rev XXXXXX"):
+    def __init__(self, rev, path = ""):
         QtGui.QWidget.__init__(self)
         self.setObjectName("revWidget")
         self.active = False
-        self.txt = txt
+        self.number = rev
+        self.txt = "Rev "+str(self.number)
+        self.path = path
 
         self.revBtn = RevButton(self.txt)
         self.submenu = SubMenuButton()
@@ -415,8 +417,8 @@ class Menu(QtGui.QWidget):
         self.scrollLayout.setSpacing(0)
 
         self.menuItem = []
-        for i in range(3):
-            self.menuItem.append(RevWidget("Rev 2145"+str(i+1)))
+        for i in [20348, 20602, 21484]:
+            self.menuItem.append(RevWidget(str(i)))
             self.scrollLayout.addWidget(self.menuItem[-1])
 
         self.scrollLayout.addItem(QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
@@ -430,6 +432,22 @@ class Menu(QtGui.QWidget):
         opt.initFrom(self)
         painter = QtGui.QPainter(self)
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+    def addMenuItem(self, infos):
+        alreadyThere = False
+        for widget in self.menuItem:
+            if widget.number == infos["rev"]:
+                alreadyThere = True
+        if not alreadyThere:
+            self.menuItem.append(RevWidget(infos["rev"], infos["path"]))
+            print self.menuItem[-1].path
+            numbers = {}
+            for widget in self.menuItem:
+                numbers[widget.number] = widget
+                widget.setParent(None)
+            for i in sorted(numbers.keys()):
+                pos = self.scrollLayout.count()-1
+                self.scrollLayout.insertWidget(pos, numbers[i])
 
     def displaySubmenu(self, current):
         start_time = time.time()
@@ -476,11 +494,8 @@ class UTWidget(QtGui.QWidget):
         self.revWidget = parent.parent()
         self.name = self.revWidget.txt
 
-
         self.setLayout(QtGui.QHBoxLayout())
         self.layout().addWidget(UnitTestCategory({"rev":self.name}))
-
-
 
     def paintEvent(self, event):
         opt = QtGui.QStyleOption()
