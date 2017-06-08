@@ -1,3 +1,92 @@
+/*GENERAL*/
+
+#content > QWidget{
+    background-color: #e6e6e6;
+}
+
+#button{
+    border: 0px solid black;
+    background-color: #449d44;
+    height: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 3px;
+    color: #e7e7e7;
+
+}
+
+#button:hover{
+    background-color: #3e8f3e;
+
+}
+
+QComboBox {
+    border: 0px solid #336ca6;
+    border-radius: 3px;
+    height: 30px;
+    font-weight: bold;
+    color: #e7e7e7;
+    min-width: 120px;
+    background: #336ca6;
+    padding-left: 10px;
+}
+QComboBox:on {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+QComboBox::drop-down {
+    image: url(icons/chevron-down-white.png);
+    border: none;
+    /*background: white;*/
+    width: 30px;
+    border-radius: 3px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+QComboBox QAbstractItemView{
+    border: none;
+    outline:none;
+    background-color: #336ca6;
+    color: #e7e7e7;
+    /*margin-left: 10px;*/
+
+}
+QComboBox QAbstractItemView::item {
+    border-right: 2px solid #2c5c8d;
+    height: 30px;
+    padding-left: 8px;
+}
+QComboBox QAbstractItemView::item:selected {
+    background-color: #337ab7;
+}
+
+
+QScrollArea{
+    border:none;
+}
+
+QWidget > QScrollBar::add-page:vertical, QWidget > QScrollBar::sub-page:vertical {
+    background: none;
+}
+QWidget > QScrollBar::sub-page:vertical, QWidget > QScrollBar::add-page:vertical {
+    background: #336ca6;
+    border-right: 2px solid #2c5c8d;
+}
+QWidget > QScrollBar:vertical {
+    border: none;
+    margin: 0px 0px 0px 0px;
+    width: 15px;
+ }
+ QWidget > QScrollBar::handle:vertical {
+    border: 2px solid #2c5c8d;
+    background: #2c5c8d;
+    min-height: 15px;
+    width: 11px;
+ }
+
+/*TOP MENU*/
 #topBar{
     background-color: #333333;
 }
@@ -28,7 +117,8 @@
     border-bottom-left-radius: 0px;
 }
 
-#menu, #settings{
+/*LEFT MENU*/
+#menu{
     background-color: #336ca6;
     border-right: 2px solid #2c5c8d;
 }
@@ -106,6 +196,7 @@
     background-color: #337ab7;
 }
 
+/*OVERLAY*/
 #overlay{
     background-color: 0, 0, 0, 127;
 }
@@ -120,32 +211,7 @@
     font-size: 18px;
 }
 
-#content > QWidget{
-    background-color: #e6e6e6;
-}
-
-#utCategory{
-    background-color: #fcf8e3;
-    max-height: 30px;
-    border-radius: 6px;
-}
-
-#button{
-    border: 0px solid black;
-    background-color: #449d44;
-    height: 30px;
-    padding-left: 20px;
-    padding-right: 20px;
-    border-radius: 3px;
-    color: #e7e7e7;
-
-}
-
-#button:hover{
-    background-color: #3e8f3e;
-
-}
-
+/*PROJECT PREFS POPUP*/
 #projectPrefs QLabel{
     color: #4d4d4d;
     font-weight: bold;
@@ -153,68 +219,26 @@
     /*text-decoration: underline;*/
 }
 
-QComboBox {
-    border: 0px solid #336ca6;
-    border-radius: 3px;
-    height: 30px;
+#utWidget{
+    margin:3px;
+}
+/*UT WIDGET*/
+#utCategory{
+    background-color: #acacac;
+    max-height: 35px;
+    border-radius: 6px;
+}
+
+#utCategory QLabel{
+    color: #2d2d2d;
     font-weight: bold;
-    color: #e7e7e7;
-    min-width: 120px;
-    background: #336ca6;
-    padding-left: 10px;
-}
-QComboBox:on {
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
+    font-size: 16px;
+    padding-top: 4px;
+    margin-left: 3px;
 }
 
-QComboBox::drop-down {
-    image: url(icons/chevron-down-white.png);
-    border: none;
-    /*background: white;*/
-    width: 30px;
-    border-radius: 3px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
+#utContent{
+    background-color: #f3f3f3;
+    border: 1px solid #acacac;
+    border-top:none;
 }
-
-QComboBox QAbstractItemView{
-    border: none;
-    outline:none;
-    background-color: #336ca6;
-    color: #e7e7e7;
-    /*margin-left: 10px;*/
-
-}
-QComboBox QAbstractItemView::item {
-    border-right: 2px solid #2c5c8d;
-    height: 30px;
-    padding-left: 8px;
-}
-QComboBox QAbstractItemView::item:selected {
-    background-color: #337ab7;
-}
-
-
-QScrollArea{
-    border:none;
-}
-
-QWidget > QScrollBar::add-page:vertical, QWidget > QScrollBar::sub-page:vertical {
-    background: none;
-}
-QWidget > QScrollBar::sub-page:vertical, QWidget > QScrollBar::add-page:vertical {
-    background: #336ca6;
-    border-right: 2px solid #2c5c8d;
-}
-QWidget > QScrollBar:vertical {
-    border: none;
-    margin: 0px 0px 0px 0px;
-    width: 15px;
- }
- QWidget > QScrollBar::handle:vertical {
-    border: 2px solid #2c5c8d;
-    background: #2c5c8d;
-    min-height: 15px;
-    width: 11px;
- }

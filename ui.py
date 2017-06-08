@@ -82,19 +82,6 @@ class FlatButton(QtGui.QPushButton):
         self.setObjectName("button")
         self.setFlat(True)
         self.setCursor(QtCore.Qt.PointingHandCursor)
-
-class UnitTestCategory(QtGui.QWidget):
-    def __init__(self, infos):
-        QtGui.QWidget.__init__(self)
-        self.setLayout(QtGui.QVBoxLayout())
-        self.layout().setContentsMargins(0, 0, 0, 0)
-        self.layout().setSpacing(0)
-        self.header = PaintedWidget(None, "utCategory")
-        self.header.setLayout(QtGui.QHBoxLayout())
-        self.header.layout().setContentsMargins(10, 0, 10, 0)
-        self.header.layout().addWidget(QtGui.QLabel(infos["rev"]+" - Unit Test"))
-
-        self.layout().addWidget(self.header)
 """
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---- Overlay/Popup
@@ -487,22 +474,6 @@ class BTWidget(QtGui.QWidget):
         painter = QtGui.QPainter(self)
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 
-class UTWidget(QtGui.QWidget):
-    def __init__(self, parent, name = ""):
-        QtGui.QWidget.__init__(self)
-        self.setMinimumSize(100, 100)
-        self.revWidget = parent.parent()
-        self.name = self.revWidget.txt
-
-        self.setLayout(QtGui.QHBoxLayout())
-        self.layout().addWidget(UnitTestCategory({"rev":self.name}))
-
-    def paintEvent(self, event):
-        opt = QtGui.QStyleOption()
-        opt.initFrom(self)
-        painter = QtGui.QPainter(self)
-        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
-
 class SearchResultWidget(QtGui.QWidget):
     def __init__(self, currentRev, text):
         QtGui.QWidget.__init__(self)
@@ -611,3 +582,84 @@ class ProjectPreference(QtGui.QWidget):
         opt.initFrom(self)
         painter = QtGui.QPainter(self)
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+
+"""
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---- Unit Test Widget
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+"""
+class UTWidget(QtGui.QWidget):
+    # Main widget wich will contain all the data about UT
+
+    def __init__(self, parent, name = ""):
+        QtGui.QWidget.__init__(self)
+        self.setMinimumSize(300, 100)
+        self.setObjectName("utWidget")
+        self.revWidget = parent.parent()
+        self.name = self.revWidget.txt
+
+        self.allCat = UnitTestCategory({"rev":self.name})
+        # for cat in ["Cat1", "Cat2"]
+
+        self.setLayout(QtGui.QVBoxLayout())
+        self.layout().addWidget(self.allCat)
+        self.layout().addItem(QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+class UnitTestCategory(QtGui.QWidget):
+    # This a the widget of a category, it is compound of a header and a content
+    # Click on the header to show the content
+
+    def __init__(self, infos):
+        QtGui.QWidget.__init__(self)
+        self.contentVisible = True
+        self.setLayout(QtGui.QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
+
+        # About the header
+        self.header = PaintedWidget(None, "utCategory")
+        self.header.setLayout(QtGui.QHBoxLayout())
+        self.header.layout().setContentsMargins(10, 5, 10, 5)
+
+        self.title = QtGui.QLabel(infos["rev"]+" - Unit Test")
+        self.run = FlatButton("RUN")
+        self.run.setMaximumWidth(80)
+
+        self.header.layout().addWidget(self.title)
+        self.header.layout().addWidget(self.run)
+
+        # About the content
+        self.content = UnitTestContent(objName = "utContent")
+
+        self.layout().addWidget(self.header)
+        self.layout().addWidget(self.content)
+        self.setCursor(QtCore.Qt.PointingHandCursor)
+        self.setContentVisibility()
+
+    def mousePressEvent(self, QMouseEvent):
+        self.setContentVisibility()
+
+    def setContentVisibility(self):
+        if self.contentVisible:
+            self.content.hide()
+            self.setStyleSheet("#utCategory{border-bottom-left-radius: 6px; border-bottom-right-radius: 6px;}")
+        else:
+            self.content.show()
+            self.setStyleSheet("#utCategory{border-bottom-left-radius: 0px; border-bottom-right-radius: 0px}")
+        self.contentVisible = not self.contentVisible
+
+class UnitTestContent(PaintedWidget):
+    def __init__(self, objName, parent = None):
+        PaintedWidget.__init__(self, parent, objName)
+        self.setMinimumHeight(100)
+        self.setLayout(QtGui.QVBoxLayout())
+
+    def mousePressEvent(self, QMouseEvent):
+        pass

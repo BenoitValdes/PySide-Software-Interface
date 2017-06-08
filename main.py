@@ -61,27 +61,25 @@ class MainWindow(QtGui.QWidget):
 
     def addRev(self):
         folder = QtGui.QFileDialog().getExistingDirectory()
-        if platform.system() == "Darwin":
-            cnode = folder+"/clarisse.app/Contents/MacOS/cnode"
-            cnode = "\\ ".join(cnode.split(" "))
-        else:
-            cnode = folder+"cnode"
-        proc = subprocess.Popen([cnode], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        (out, err) = proc.communicate()
-        if out:
-            output = out
-        else:
-            output = err
+        if folder:
+            if platform.system() == "Darwin":
+                cnode = folder+"/clarisse.app/Contents/MacOS/cnode"
+                cnode = "\\ ".join(cnode.split(" "))
+            else:
+                cnode = folder+"cnode"
+            proc = subprocess.Popen([cnode], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            (out, err) = proc.communicate()
+            if out:
+                output = out
+            else:
+                output = err
 
-        revNumber =  re.findall("#[0-9]*", output)[0][1:]
-        path = cnode
+            revNumber =  re.findall("#[0-9]*", output)[0][1:]
+            path = cnode
 
-        infos = {"rev": revNumber, "path": path}
+            infos = {"rev": revNumber, "path": path}
 
-        self.left_menu.addMenuItem(infos)
-
-
-
+            self.left_menu.addMenuItem(infos)
 
     def searchSlot(self):
         currentRev = None
