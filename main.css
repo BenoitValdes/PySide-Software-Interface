@@ -222,6 +222,8 @@ QWidget > QScrollBar:vertical {
 #utWidget{
     margin:3px;
 }
+
+
 /*UT WIDGET*/
 #utCategory{
     background-color: #acacac;
@@ -242,3 +244,24 @@ QWidget > QScrollBar:vertical {
     border: 1px solid #acacac;
     border-top:none;
 }
+
+
+#utHeader{
+    background-color: #acacac;
+    height: 35;
+    border-radius: 6px;
+}
+
+#utHeader[open = "true"]{
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+
+#utHeader QLabel{
+    color: #4d4d4d;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+

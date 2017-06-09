@@ -66,7 +66,7 @@ class IconButton(QtGui.QPushButton):
         self.setCursor(QtCore.Qt.PointingHandCursor)
 
 class PaintedWidget(QtGui.QWidget):
-    def __init__(self, parent, objectName):
+    def __init__(self, parent = None, objectName = ""):
         QtGui.QWidget.__init__(self, parent)
         self.setObjectName(objectName)
 
@@ -589,22 +589,53 @@ class ProjectPreference(QtGui.QWidget):
 ---- Unit Test Widget
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 """
-class UTWidget(QtGui.QWidget):
+class UTWidget(PaintedWidget):
     # Main widget wich will contain all the data about UT
 
-    def __init__(self, parent, name = ""):
-        QtGui.QWidget.__init__(self)
-        self.setMinimumSize(300, 100)
-        self.setObjectName("utWidget")
+    def __init__(self, parent):
+        PaintedWidget.__init__(self)
         self.revWidget = parent.parent()
         self.name = self.revWidget.txt
 
-        self.allCat = UnitTestCategory({"rev":self.name})
-        # for cat in ["Cat1", "Cat2"]
+        self.mainHeader = UTHeader(self.name+" - Unit Test")
+        self.mainContent = UnitTestContent()
+        for i in range(50):
+            self.mainContent.layout().addWidget(UTHeader("plop"+str(i)))
 
         self.setLayout(QtGui.QVBoxLayout())
-        self.layout().addWidget(self.allCat)
+        self.layout().setSpacing(0)
+        self.layout().addWidget(self.mainHeader)
+        self.layout().addWidget(self.mainContent)
         self.layout().addItem(QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
+        self.mainHeader.clicked.connect(self.showMainContent)
+
+
+
+
+
+
+
+
+
+        # self.setMinimumSize(300, 100)
+        # self.setObjectName("utWidget")
+        # self.revWidget = parent.parent()
+        # self.name = self.revWidget.txt
+
+        # self.allCat = UnitTestCategory({"rev":self.name})
+        # # for cat in ["Cat1", "Cat2"]
+
+        # self.setLayout(QtGui.QVBoxLayout())
+        # self.layout().addWidget(self.allCat)
+        # self.layout().addItem(QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
+    def showMainContent(self):
+        self.mainContent.visible = not self.mainContent.visible
+        if self.mainContent.visible:
+            self.mainContent.setMaximumHeight(self.mainContent.sizeHint().height())
+        else:
+            self.mainContent.setMaximumHeight(0)
 
     def paintEvent(self, event):
         opt = QtGui.QStyleOption()
@@ -612,9 +643,35 @@ class UTWidget(QtGui.QWidget):
         painter = QtGui.QPainter(self)
         self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
 
+class UTHeader(PaintedWidget):
+    def __init__(self, label):
+        PaintedWidget.__init__(self, objectName = "utHeader")
+        self.clicked = CustomSignal().clicked
+        self.open = False
+        self.setProperty("open", self.open)
+        self.setFixedHeight(int(getCssValue("utHeader", "height")))
+        self.setLayout(QtGui.QHBoxLayout())
+        self.layout().setContentsMargins(10, 5, 10, 5)
+        # self.layout().setSpacing(0)
+        self.title = QtGui.QLabel(label)
+        self.run = FlatButton("RUN")
+        self.run.setMaximumWidth(80)
+
+        self.layout().addWidget(self.title)
+        self.layout().addWidget(self.run)
+        self.setCursor(QtCore.Qt.PointingHandCursor)
+
+    def mousePressEvent(self, QMouseEvent):
+        self.open = not self.open
+        self.changeStyle("open", self.open)
+        self.clicked.emit()
+
+    def changeStyle(self, qproperty, value):
+        self.setProperty(qproperty, value)
+        self.style().polish(self)
+
 class UnitTestCategory(QtGui.QWidget):
-    # This a the widget of a category, it is compound of a header and a content
-    # Click on the header to show the content
+    # OLD WAY< HAVE TO BE REWRITTEN
 
     def __init__(self, infos):
         QtGui.QWidget.__init__(self)
@@ -656,10 +713,83 @@ class UnitTestCategory(QtGui.QWidget):
         self.contentVisible = not self.contentVisible
 
 class UnitTestContent(PaintedWidget):
-    def __init__(self, objName, parent = None):
-        PaintedWidget.__init__(self, parent, objName)
-        self.setMinimumHeight(100)
+    def __init__(self, parent = None):
+        PaintedWidget.__init__(self, parent, "utContent")
+        self.visible = False
+        # self.setMinimumHeight(100)
         self.setLayout(QtGui.QVBoxLayout())
+        self.setMaximumHeight(0)
 
     def mousePressEvent(self, QMouseEvent):
         pass
+
+
+
+"""
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---- Unit Test Widget
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+"""
+
+class GradientSquare(QtGui.QWidget):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
+
+        self.color = QtGui.QColor("#ff0000")
+
+        self.colorGradient = QtGui.QLinearGradient(0, 0, self.width(), 0)
+        self.colorGradient.setColorAt(0.0, QtGui.QColor(255, 255, 255))
+        self.colorGradient.setColorAt(1.0, self.color)
+
+        self.satGradient = QtGui.QLinearGradient(0, 0, 0, self.height())
+        self.satGradient.setColorAt(0.0, QtGui.QColor(255, 255, 255, 0))
+        self.satGradient.setColorAt(1.0, QtGui.QColor(0, 0, 0))
+
+
+        self.whiteCircle = CustomIcon("./icons/circle.png", "ffffff", (16, 16))
+        self.BlackCircle = CustomIcon("./icons/circle.png", "000000", (16, 16))
+
+        self.cursor = QtGui.QLabel("O")
+        self.cursor.setPixmap(self.BlackCircle)
+        self.cursor.setParent(self)
+        self.pos = QtCore.QPoint(-2, -2)
+        self.mousePos = QtCore.QPoint(0, 0)
+
+        self.moveCursor()
+
+
+
+    def mousePressEvent(self, event):
+        if event.pos().x() > -1 and event.pos().x() < self.width()+1 and event.pos().y() > -1 and event.pos().y() < self.height()+1:
+            self.moveCursor(event)
+
+    def mouseMoveEvent(self, event):
+        if event.pos().x() > 0 and event.pos().x() < self.width() and event.pos().y() > 0 and event.pos().y() < self.height():
+            self.moveCursor(event)
+
+    def moveCursor(self, event = None):
+        if event:
+            self.mousePos = event.pos()
+            self.pos.setX(event.pos().x()-(self.cursor.sizeHint().height()/2))
+            self.pos.setY(event.pos().y()-(self.cursor.sizeHint().width()/2))
+            if event.pos().y() > (self.height()/3):
+                self.cursor.setPixmap(self.whiteCircle)
+            else:
+                self.cursor.setPixmap(self.BlackCircle)
+
+        self.cursor.move(self.pos)
+
+
+        img = QtGui.QPixmap().grabWidget(self, self.rect()).toImage()
+        print QtGui.QColor(img.pixel(self.mousePos.x(), self.mousePos.y())).getRgb()
+        print self.mousePos
+
+
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter()
+        painter.begin(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.fillRect(event.rect(), self.colorGradient)
+        painter.fillRect(event.rect(), self.satGradient)
+        painter.end()

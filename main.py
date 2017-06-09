@@ -16,11 +16,16 @@ class MainWindow(QtGui.QWidget):
         self.top_menu = ui.TopBar()
         self.left_menu = ui.Menu()
         self.settings = ui.Settings()
+
         self.content_widget = QtGui.QStackedWidget()
-        self.content_widget.setObjectName("content")
         self.widgets = []
-        self.widgets.append(ui.PlaceHolder("e6e6e6"))
+        self.widgets.append(ui.GradientSquare())  # self.widgets.append(ui.PlaceHolder("e6e6e6"))
         self.projectSettings = ui.ProjectPreference()
+
+        self.scrollArea = QtGui.QScrollArea()
+        self.scrollArea.setWidget(self.content_widget)
+        self.scrollArea.setWidgetResizable(True)
+        self.content_widget.setObjectName("content")
 
         # Layout
         self.main_layout = QtGui.QVBoxLayout()
@@ -33,7 +38,7 @@ class MainWindow(QtGui.QWidget):
         self.main_layout.addWidget(self.top_menu)
         self.main_layout.addLayout(self.core_layout)
         self.core_layout.addWidget(self.left_menu)
-        self.core_layout.addWidget(self.content_widget)
+        self.core_layout.addWidget(self.scrollArea)
         self.core_layout.addWidget(self.settings)
         for widget in self.widgets:
             self.content_widget.addWidget(widget)
