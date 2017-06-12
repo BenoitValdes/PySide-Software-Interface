@@ -7,7 +7,7 @@ class MainWindow(QtGui.QWidget):
         # Window Config
         self.setObjectName("mainWindow")
         self.setStyleSheet(ui.css)
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowTitle('QA Software')
         # self.move(3200, 658)
         self.resize(800, 500)
@@ -18,7 +18,7 @@ class MainWindow(QtGui.QWidget):
 
         self.content_widget = QtGui.QStackedWidget()
         self.widgets = []
-        self.widgets.append(ui.ColorPicker())  # self.widgets.append(ui.PlaceHolder("e6e6e6"))
+        self.widgets.append(ui.PlaceHolder("e6e6e6"))
         self.projectSettings = ui.ProjectPreference()
 
         self.scrollArea = QtGui.QScrollArea()
@@ -61,6 +61,11 @@ class MainWindow(QtGui.QWidget):
         # self.left_menu.buttons[0].clicked.connect(lambda: self.changeContent(0))
         # self.left_menu.buttons[1].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff0000")))
         # self.left_menu.buttons[2].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
+
+
+    def colorPicker(self):
+        color = ui.ColorPicker()
+        color.show()
 
     def addRev(self):
         folder = QtGui.QFileDialog().getExistingDirectory()
