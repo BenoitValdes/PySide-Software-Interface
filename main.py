@@ -7,7 +7,7 @@ class MainWindow(QtGui.QWidget):
         # Window Config
         self.setObjectName("mainWindow")
         self.setStyleSheet(ui.css)
-        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowTitle('QA Software')
         # self.move(3200, 658)
         self.resize(800, 500)
@@ -15,11 +15,10 @@ class MainWindow(QtGui.QWidget):
         # Widgets
         self.top_menu = ui.TopBar()
         self.left_menu = ui.Menu()
-        self.settings = ui.Settings()
 
         self.content_widget = QtGui.QStackedWidget()
         self.widgets = []
-        self.widgets.append(ui.GradientSquare())  # self.widgets.append(ui.PlaceHolder("e6e6e6"))
+        self.widgets.append(ui.ColorPicker())  # self.widgets.append(ui.PlaceHolder("e6e6e6"))
         self.projectSettings = ui.ProjectPreference()
 
         self.scrollArea = QtGui.QScrollArea()
@@ -39,7 +38,6 @@ class MainWindow(QtGui.QWidget):
         self.main_layout.addLayout(self.core_layout)
         self.core_layout.addWidget(self.left_menu)
         self.core_layout.addWidget(self.scrollArea)
-        self.core_layout.addWidget(self.settings)
         for widget in self.widgets:
             self.content_widget.addWidget(widget)
 
