@@ -7,7 +7,7 @@ class MainWindow(QtGui.QWidget):
         # Window Config
         self.setObjectName("mainWindow")
         self.setStyleSheet(ui.css)
-        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowTitle('QA Software')
         # self.move(3200, 658)
         self.resize(800, 500)
@@ -16,9 +16,10 @@ class MainWindow(QtGui.QWidget):
         self.top_menu = ui.TopBar()
         self.left_menu = ui.Menu()
 
+        self.placeHolder = ui.PlaceHolder("e6e6e6")
         self.content_widget = QtGui.QStackedWidget()
         self.widgets = []
-        self.widgets.append(ui.PlaceHolder("e6e6e6"))
+        self.widgets.append(self.placeHolder)
         self.projectSettings = ui.ProjectPreference()
 
         self.scrollArea = QtGui.QScrollArea()
@@ -30,6 +31,7 @@ class MainWindow(QtGui.QWidget):
         self.main_layout = QtGui.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
+
         self.core_layout = QtGui.QHBoxLayout()
         self.core_layout.setContentsMargins(0,0,0,0)
         self.core_layout.setSpacing(0)
@@ -43,6 +45,8 @@ class MainWindow(QtGui.QWidget):
 
         self.setLayout(self.main_layout)
         self.overlay = ui.Overlay(self)
+
+        # self.colorPicker = ui.ColorPicker(self.placeHolder)
 
         # --- Connections ---------------------------------------------------------------------------------------------
         self.top_menu.menuBtn.clicked.connect(lambda: self.displayMenu(self.left_menu))
@@ -113,7 +117,9 @@ class MainWindow(QtGui.QWidget):
             self.widgets.append(widget)
             widget = self.widgets[-1]
             self.content_widget.addWidget(widget)
+        self.content_widget.setMaximumHeight(1)
         self.content_widget.setCurrentWidget(widget)
+        self.content_widget.setMaximumHeight(99999)
 
     def displayOverlay(self, widget=False):
         if widget:
@@ -126,6 +132,7 @@ class MainWindow(QtGui.QWidget):
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
+    app.setStyle(QtGui.QStyleFactory.create("Windows"))
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())

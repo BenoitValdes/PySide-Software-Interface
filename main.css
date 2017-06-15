@@ -20,6 +20,9 @@
 
 }
 
+QWidget{
+    outline: none;
+}
 QComboBox {
     border: 0px solid #336ca6;
     border-radius: 3px;
@@ -66,25 +69,6 @@ QComboBox QAbstractItemView::item:selected {
 QScrollArea{
     border:none;
 }
-
-QWidget > QScrollBar::add-page:vertical, QWidget > QScrollBar::sub-page:vertical {
-    background: none;
-}
-QWidget > QScrollBar::sub-page:vertical, QWidget > QScrollBar::add-page:vertical {
-    background: #336ca6;
-    border-right: 2px solid #2c5c8d;
-}
-QWidget > QScrollBar:vertical {
-    border: none;
-    margin: 0px 0px 0px 0px;
-    width: 15px;
- }
- QWidget > QScrollBar::handle:vertical {
-    border: 2px solid #2c5c8d;
-    background: #2c5c8d;
-    min-height: 15px;
-    width: 11px;
- }
 
 /*TOP MENU*/
 #topBar{
@@ -173,6 +157,7 @@ QWidget > QScrollBar:vertical {
     background-color: #337ab7;
     border: none;
     border-bottom: 2px solid #2c5c8d;
+    border-right: 2px solid #2c5c8d;
 }
 
 #revBtn > QLabel{
@@ -190,11 +175,32 @@ QWidget > QScrollBar:vertical {
     border: none;
     padding: 2px 40px 0px 0px;
     border-bottom: 2px solid #2c5c8d;
+    border-right: 2px solid #2c5c8d;
 }
 
 #subMenuBtn:hover{
     background-color: #337ab7;
+    border-right: 2px solid #2c5c8d;
 }
+
+#menu QScrollBar::add-page:vertical, #menu QScrollBar::sub-page:vertical {
+    background: none;
+}
+#menu QScrollBar::sub-page:vertical, #menu QScrollBar::add-page:vertical {
+    background: #336ca6;
+    border-right: 2px solid #2c5c8d;
+}
+#menu QScrollBar:vertical {
+    border: none;
+    margin: 0px 0px 0px 0px;
+    width: 15px;
+ }
+ #menu QScrollBar::handle:vertical {
+    border: 2px solid #2c5c8d;
+    background: #2c5c8d;
+    min-height: 15px;
+    width: 11px;
+ }
 
 /*OVERLAY*/
 #overlay{
@@ -264,4 +270,41 @@ QWidget > QScrollBar:vertical {
     font-size: 16px;
 }
 
+#colorPicker QLabel{
+    color: red;
+    font-weight: bold;
+}
 
+#colorPicker QSpinBox{
+    min-width: 60px;
+}
+
+#colorPicker QPushButton{
+    border:none;
+    background-color: #c8c8c8;
+    height: 16px;
+    padding-top: 3px;
+
+}
+
+/*#tagRed{
+    background-color: #D9534F;
+    max-width: 50px;
+    border-radius: 3px;
+    color: white;
+    font-weight: bold;
+    min-height: 20px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding-top: 2px;
+}*/
+#tag QLabel{
+    color: white;
+    font-weight: bold;
+}
+
+#tag QLabel#value{
+    font-size: 20px;
+    min-height: 20px;
+}
