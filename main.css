@@ -1,6 +1,6 @@
 /*GENERAL*/
 
-#content > QWidget{
+#content{
     background-color: #e6e6e6;
 }
 
@@ -209,6 +209,7 @@ QScrollArea{
 
 #popup{
     background-color: #edeff0;
+    border: none;
 }
 
 #title{
@@ -287,18 +288,6 @@ QScrollArea{
 
 }
 
-/*#tagRed{
-    background-color: #D9534F;
-    max-width: 50px;
-    border-radius: 3px;
-    color: white;
-    font-weight: bold;
-    min-height: 20px;
-    border: none;
-    color: white;
-    font-weight: bold;
-    padding-top: 2px;
-}*/
 #tag QLabel{
     color: white;
     font-weight: bold;
@@ -307,4 +296,49 @@ QScrollArea{
 #tag QLabel#value{
     font-size: 20px;
     min-height: 20px;
+}
+
+#tag[type = "succeed"], #unitTest[state = "succeed"]{
+    background-color: #5DB85B;
+}
+
+#tag[type = "failure"], #unitTest[state = "failure"]{
+    background-color: #EFAD4D;
+}
+
+#tag[type = "error"], #unitTest[state = "error"]{
+    background-color: #D95350;
+}
+
+#tag[type = "untested"], #tag[type = "untested"] QLabel, #unitTest[state = "untested"]{
+    background-color: lightgray;
+    color: black;
+}
+
+#unitTest{
+    min-height: 30px;
+    border: 1px solid #acacac;
+    border-top: none;
+    border-bottom: 3px solid qlineargradient(x1:0, y1:0, x2:0 y2:1, stop:0 grey, stop:1 white);
+}
+
+#unitTest[state = "untested"] QLabel{
+    color: black;
+}
+
+#unitTest[state = "selected"]{
+    background-color: #418BCA;
+}
+
+#unitTest QLabel{
+    color: white;
+    font-weight: bold;
+}
+
+#mantis{
+    background-color: white;
+    border-left: 5px solid #FCBDBD;
+    padding-left: 5px;
+    padding-top: 2px;
+    font-weight: bold;
 }

@@ -1,5 +1,5 @@
 from PySide import QtCore, QtGui
-import os, re, time
+import os, re, time, webbrowser
 
 """
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -90,6 +90,7 @@ class Tag(QtGui.QFrame):
         QtGui.QFrame.__init__(self)
         self.setObjectName("tag")
         self.setLayout(QtGui.QVBoxLayout())
+        self.setProperty("type", "")
         # self.layout().setContentsMargins(0, 5, 0, 5)
 
         self.value = QtGui.QLabel("0")
@@ -106,13 +107,45 @@ class Tag(QtGui.QFrame):
 
     def setColor(self, name):
         if name == "SUCCEED":
-            self.setStyleSheet("background-color: #5DB85B;")
+            self.setProperty("type", "succeed")
         if name == "FAILURE":
-            self.setStyleSheet("background-color: #EFAD4D;")
+            self.setProperty("type", "failure")
         if name == "ERROR":
-            self.setStyleSheet("background-color: #D95350;")
+            self.setProperty("type", "error")
         if name == "UNTESTED":
-            self.setStyleSheet("background-color: #418BCA;")
+            self.setProperty("type", "untested")
+
+class ResizableWidget(QtGui.QScrollArea):
+    def __init__(self, widget):
+        QtGui.QScrollArea.__init__(self)
+        self.setWidgetResizable(True)
+        self.widget = widget
+        self.setWidget(self.widget)
+
+class Mantis(QtGui.QLabel):
+    def __init__(self, name = ""):
+        QtGui.QLabel.__init__(self)
+        self.setFixedSize(50, 20)
+
+        self.state = "new"
+        self.name = str(name)
+        self.setProperty("state", self.state)
+
+        self.setObjectName("mantis")
+        self.setText(self.name)
+        self.setCursor(QtCore.Qt.PointingHandCursor)
+
+    def mousePressEvent(self, QMouseEvent):
+        url = "http://wiki.isotropix.net/mantis/view.php?id="+self.name
+        print url
+        webbrowser.open(url)
+
+    def changeState(self, name):
+        self.state = name
+        self.setProperty("state", self.state)
+
+
+
 """
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---- Overlay/Popup
@@ -358,7 +391,7 @@ class SubMenuButton(QtGui.QWidget):
         mainWindow = self.window()
         if self.sender() == self.buttons[0]:
             if not self.utWidget:
-                self.utWidget = UTWidget(self)
+                self.utWidget = ResizableWidget(UTWidget(self))
             mainWindow.changeContent(self.utWidget)
         if self.sender() == self.buttons[1]:
             if not self.btWidget:
@@ -498,6 +531,7 @@ class BTWidget(QtGui.QWidget):
         self.setMinimumSize(100, 100)
         self.revWidget = parent.parent()
         self.name = self.revWidget.txt
+        self.setObjectName("content")
 
 
         self.setLayout(QtGui.QHBoxLayout())
@@ -561,7 +595,7 @@ class PlaceHolder(QtGui.QWidget):
         self.setMinimumSize(100, 100)
         self.setObjectName("plop")
         css="""
-        plop{
+        #plop{
             background-color: #"""+color+"""
         }
         """
@@ -637,13 +671,22 @@ class UTWidget(PaintedWidget):
         PaintedWidget.__init__(self)
         self.revWidget = parent.parent()
         self.name = self.revWidget.txt
+        self.setObjectName("content")
+
+        self.selectedUT = {}
 
         self.mainHeader = UTHeader(self.name+" - Unit Test")
         self.mainContent = UnitTestContent()
         self.mainContent.layout().setContentsMargins(0, 0, 0, 10)
+
         # Just for test
         for i in range(10):
-            self.mainContent.layout().addWidget(UnitTestCategory({"name": "Unit Test "+str(1)}))
+            widget = UnitTestCategory({"name": "Unit Test "+str(i+1)})
+            widget.content.layout().addWidget(UnitTest())
+            widget.content.layout().addWidget(UnitTest())
+            widget.content.layout().addWidget(UnitTest())
+            widget.content.layout().addWidget(UnitTest())
+            self.mainContent.layout().addWidget(widget)
 
         self.setLayout(QtGui.QVBoxLayout())
         self.layout().setSpacing(0)
@@ -655,6 +698,18 @@ class UTWidget(PaintedWidget):
         self.mainHeader.mousePressEvent(None)
         self.mainContent.changeState()
         self.mainHeader.freeze = True
+
+    def updateSelected(self, catName, content):
+        if not content:
+            del self.selectedUT[catName]
+        else:
+            self.selectedUT[catName] = content
+
+        if self.selectedUT:
+            self.mainHeader.runSelected.show()
+        else:
+            self.mainHeader.runSelected.hide()
+        print self.selectedUT
 
     def paintEvent(self, event):
         opt = QtGui.QStyleOption()
@@ -672,12 +727,17 @@ class UTHeader(PaintedWidget):
         self.setFixedHeight(int(getCssValue("utHeader", "height")))
         self.setLayout(QtGui.QHBoxLayout())
         self.layout().setContentsMargins(10, 5, 10, 5)
-        # self.layout().setSpacing(0)
+
         self.title = QtGui.QLabel(label)
         self.run = FlatButton("RUN")
         self.run.setMaximumWidth(80)
 
+        self.runSelected = FlatButton("RUN SELECTED")
+        self.runSelected.setMaximumWidth(150)
+        self.runSelected.hide()
+
         self.layout().addWidget(self.title)
+        self.layout().addWidget(self.runSelected)
         self.layout().addWidget(self.run)
         self.setCursor(QtCore.Qt.PointingHandCursor)
 
@@ -727,12 +787,13 @@ class UnitTestContent(PaintedWidget):
 
 
 class UnitTestCategory(QtGui.QWidget):
-
     def __init__(self, infos):
         QtGui.QWidget.__init__(self)
         self.setLayout(QtGui.QVBoxLayout())
         self.layout().setContentsMargins(10, 0, 10, 0)
         self.layout().setSpacing(0)
+
+        self.selectedUT = []
 
         self.header = UTHeader(infos["name"])
         self.content = UnitTestContent()
@@ -741,3 +802,93 @@ class UnitTestCategory(QtGui.QWidget):
         self.layout().addWidget(self.content)
 
         self.header.clicked.connect(self.content.changeState)
+
+    def updateSelected(self, widget):
+        if widget.selected and not widget in self.selectedUT:
+            self.selectedUT.append(widget)
+        elif not widget.selected and widget in self.selectedUT:
+            self.selectedUT.pop(self.selectedUT.index(widget))
+
+        if self.selectedUT:
+            self.header.runSelected.show()
+        else:
+            self.header.runSelected.hide()
+
+        self.parent().parent().updateSelected(self.header.title.text(), self.selectedUT)
+
+class UnitTest(QtGui.QWidget):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
+        self.setObjectName("unitTest")
+        self.state = "untested"
+        self.selected = False
+        self.setProperty("state", self.state)
+
+        self.label = QtGui.QLabel("UnitTest Name")
+        self.run = FlatButton("RUN")
+        self.run.setMaximumWidth(80)
+
+        self.setLayout(QtGui.QHBoxLayout())
+        self.layout().setContentsMargins(30, 0, 10, 0)
+        self.layout().addWidget(self.label)
+        self.layout().addWidget(self.run)
+
+        self.setCursor(QtCore.Qt.PointingHandCursor)
+
+    def mousePressEvent(self, QMouseEvent):
+        key = QtGui.QApplication.keyboardModifiers()
+        if key == QtCore.Qt.ControlModifier:
+            self.selected = not self.selected
+            self.parent().parent().updateSelected(self)
+            self.changeStyle()
+        else:
+            self.window().displayOverlay(UnitTestInfos())
+
+    def changeStyle(self):
+        value = self.state
+        if self.selected:
+            value = "selected"
+        self.setProperty("state", value)
+        self.style().polish(self)
+        self.style().polish(self.label)
+
+
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
+
+class UnitTestInfos(QtGui.QWidget):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
+        self.widgetName = "Unit Test"
+        self.setLayout(QtGui.QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
+
+        self.copyBtn = FlatButton("Copy script to Clipboard")
+
+        topLayout = QtGui.QHBoxLayout()
+
+        topLayout.addWidget(QtGui.QLabel("Created 25/04/2014 - Updated 24/05/2016"))
+        topLayout.addWidget(self.copyBtn)
+
+        self.description = QtGui.QLabel()
+        self.description.setWordWrap(True)
+        txt = '''<h2><span style="text-decoration: underline;">Description:</span></h2>
+<p align= "justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed pellentesque purus. Vestibulum ac elit et augue cursus pharetra. Nullam vel elementum dui, a congue quam. Suspendisse elit massa, tempus vitae luctus ac, vestibulum non lectus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer ac purus gravida justo pharetra finibus a non quam. Nam eleifend dapibus arcu auctor cursus. Suspendisse sollicitudin sed dui eget egestas. Cras convallis finibus justo, a rutrum nisl dapibus eu. Aenean maximus blandit velit, quis porta orci interdum sit amet. In vitae elementum velit, sed dictum nulla. Phasellus lacinia non nulla eu dignissim.</p>
+<h2><span style="text-decoration: underline;">Mantis:</span></h2>
+        '''
+        self.description.setText(txt)
+
+        self.layout().addLayout(topLayout)
+        self.layout().addWidget(self.description)
+        self.layout().addWidget(Mantis(6245))
+
+        self.copyBtn.clicked.connect(self.copyToClipboard)
+
+    def copyToClipboard(self):
+        cb = QtGui.QApplication.clipboard()
+        cb.clear(mode=cb.Clipboard )
+        cb.setText("Clipboard Text", mode=cb.Clipboard)
