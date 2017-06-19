@@ -105,6 +105,9 @@ class Tag(QtGui.QFrame):
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.setColor(name)
 
+    def add(self):
+        self.value.setText(str(int(self.value.text())+1))
+
     def setColor(self, name):
         if name == "SUCCEED":
             self.setProperty("type", "succeed")
@@ -665,8 +668,6 @@ class ProjectPreference(QtGui.QWidget):
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 """
 class UTWidget(PaintedWidget):
-    # Main widget wich will contain all the data about UT
-
     def __init__(self, parent):
         PaintedWidget.__init__(self)
         self.revWidget = parent.parent()
@@ -679,13 +680,16 @@ class UTWidget(PaintedWidget):
         self.mainContent = UnitTestContent()
         self.mainContent.layout().setContentsMargins(0, 0, 0, 10)
 
+        self.categories = []
+
         # Just for test
         for i in range(10):
-            widget = UnitTestCategory({"name": "Unit Test "+str(i+1)})
-            widget.content.layout().addWidget(UnitTest())
-            widget.content.layout().addWidget(UnitTest())
-            widget.content.layout().addWidget(UnitTest())
-            widget.content.layout().addWidget(UnitTest())
+            widget = UnitTestCategory({"name": "Unit Test "+str(i+1)}, self)
+            widget.addUT("succeed")
+            widget.addUT()
+            widget.addUT("failure")
+            widget.addUT("succeed")
+            widget.addUT("error")
             self.mainContent.layout().addWidget(widget)
 
         self.setLayout(QtGui.QVBoxLayout())
@@ -693,7 +697,6 @@ class UTWidget(PaintedWidget):
         self.layout().addWidget(self.mainHeader)
         self.layout().addWidget(self.mainContent)
         self.layout().addItem(QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-
 
         self.mainHeader.mousePressEvent(None)
         self.mainContent.changeState()
@@ -725,8 +728,13 @@ class UTHeader(PaintedWidget):
         self.freeze = False
         self.setProperty("open", self.open)
         self.setFixedHeight(int(getCssValue("utHeader", "height")))
-        self.setLayout(QtGui.QHBoxLayout())
-        self.layout().setContentsMargins(10, 5, 10, 5)
+
+        self.mainLayout = QtGui.QHBoxLayout()
+        self.mainLayout.setSpacing(0)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.titleLayout = QtGui.QHBoxLayout()
+        self.titleLayout.setContentsMargins(10, 5, 10, 5)
 
         self.title = QtGui.QLabel(label)
         self.run = FlatButton("RUN")
@@ -736,9 +744,23 @@ class UTHeader(PaintedWidget):
         self.runSelected.setMaximumWidth(150)
         self.runSelected.hide()
 
-        self.layout().addWidget(self.title)
-        self.layout().addWidget(self.runSelected)
-        self.layout().addWidget(self.run)
+        self.titleLayout.addWidget(self.title)
+        self.titleLayout.addWidget(self.runSelected)
+        self.titleLayout.addWidget(self.run)
+
+        self.tag = QtGui.QFrame()
+        self.tag.setObjectName("tagUT")
+        self.tag.setProperty("state", "untested")
+
+        self.mainLayout.addWidget(self.tag)
+
+
+
+
+        self.mainLayout.addLayout(self.titleLayout)
+        self.setLayout(self.mainLayout)
+
+
         self.setCursor(QtCore.Qt.PointingHandCursor)
 
     def mousePressEvent(self, QMouseEvent):
@@ -749,7 +771,12 @@ class UTHeader(PaintedWidget):
     def changeStyle(self, qproperty, value):
         if not self.freeze:
             self.setProperty(qproperty, value)
+            self.tag.setProperty(qproperty, value)
+            self.style().unpolish(self)
             self.style().polish(self)
+            self.style().unpolish(self.tag)
+            self.style().polish(self.tag)
+            self.update()
 
 class UnitTestContent(PaintedWidget):
     def __init__(self, parent = None):
@@ -760,19 +787,21 @@ class UnitTestContent(PaintedWidget):
         self.layout().setContentsMargins(0, 0, 0, 10)
         self.setMaximumHeight(0)
 
-        self.succeed = Tag("SUCCEED")
-        self.failed = Tag("FAILURE")
-        self.error = Tag("ERROR")
-        self.untested = Tag("UNTESTED")
+        self.tags = {
+            "succeed" : Tag("SUCCEED"),
+            "failure" : Tag("FAILURE"),
+            "error" : Tag("ERROR"),
+            "untested" : Tag("UNTESTED")
+        }
 
         reportLayout = QtGui.QHBoxLayout()
         reportLayout.setSizeConstraint(QtGui.QLayout.SetNoConstraint)
         reportLayout.setContentsMargins(0, 0, 0, 0)
         reportLayout.setSpacing(0)
-        reportLayout.addWidget(self.succeed)
-        reportLayout.addWidget(self.failed)
-        reportLayout.addWidget(self.error)
-        reportLayout.addWidget(self.untested)
+        reportLayout.addWidget(self.tags["untested"])
+        reportLayout.addWidget(self.tags["succeed"])
+        reportLayout.addWidget(self.tags["failure"])
+        reportLayout.addWidget(self.tags["error"])
 
         self.layout().addLayout(reportLayout)
 
@@ -780,20 +809,19 @@ class UnitTestContent(PaintedWidget):
         self.visible = not self.visible
         if self.visible:
             self.setMaximumHeight(999999)
-            # self.show()
         else:
             self.setMaximumHeight(0)
-            # self.hide()
 
 
 class UnitTestCategory(QtGui.QWidget):
-    def __init__(self, infos):
-        QtGui.QWidget.__init__(self)
+    def __init__(self, infos, parent = None):
+        QtGui.QWidget.__init__(self, parent)
         self.setLayout(QtGui.QVBoxLayout())
         self.layout().setContentsMargins(10, 0, 10, 0)
         self.layout().setSpacing(0)
 
         self.selectedUT = []
+        self.listOfUT = []
 
         self.header = UTHeader(infos["name"])
         self.content = UnitTestContent()
@@ -802,6 +830,11 @@ class UnitTestCategory(QtGui.QWidget):
         self.layout().addWidget(self.content)
 
         self.header.clicked.connect(self.content.changeState)
+
+    def addUT(self, state = "untested"):
+        self.content.tags[state].add()
+        self.listOfUT.append(UnitTest(state))
+        self.content.layout().addWidget(self.listOfUT[-1])
 
     def updateSelected(self, widget):
         if widget.selected and not widget in self.selectedUT:
@@ -817,19 +850,25 @@ class UnitTestCategory(QtGui.QWidget):
         self.parent().parent().updateSelected(self.header.title.text(), self.selectedUT)
 
 class UnitTest(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, state = "untested"):
         QtGui.QWidget.__init__(self)
         self.setObjectName("unitTest")
-        self.state = "untested"
+        self.state = state
         self.selected = False
-        self.setProperty("state", self.state)
+        self.setProperty("selected", self.state)
+
+        self.tag = QtGui.QFrame()
+        self.tag.setObjectName("tagUT")
+        self.tag.setProperty("state", self.state)
 
         self.label = QtGui.QLabel("UnitTest Name")
+
         self.run = FlatButton("RUN")
         self.run.setMaximumWidth(80)
 
         self.setLayout(QtGui.QHBoxLayout())
-        self.layout().setContentsMargins(30, 0, 10, 0)
+        self.layout().setContentsMargins(0, 0, 10, 0)
+        self.layout().addWidget(self.tag)
         self.layout().addWidget(self.label)
         self.layout().addWidget(self.run)
 
@@ -840,17 +879,18 @@ class UnitTest(QtGui.QWidget):
         if key == QtCore.Qt.ControlModifier:
             self.selected = not self.selected
             self.parent().parent().updateSelected(self)
-            self.changeStyle()
+            self.setProperty("selected", str(self.selected))
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.update()
         else:
             self.window().displayOverlay(UnitTestInfos())
 
     def changeStyle(self):
-        value = self.state
-        if self.selected:
-            value = "selected"
-        self.setProperty("state", value)
-        self.style().polish(self)
-        self.style().polish(self.label)
+        self.tag.setProperty("state", value)
+        self.style().unpolish(self.tag)
+        self.style().polish(self.tag)
+        self.update()
 
 
     def paintEvent(self, event):

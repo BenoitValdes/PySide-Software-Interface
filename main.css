@@ -248,45 +248,47 @@ QScrollArea{
 
 #utContent{
     background-color: #f3f3f3;
-    border: 1px solid #acacac;
+    border: 1px solid silver;
     border-top:none;
 }
 
 
 #utHeader{
-    background-color: #acacac;
+    background-color: silver;
     height: 35;
     border-radius: 6px;
+    /*border: 2px solid #acacac;*/
+    /*border-bottom: none;*/
+
 }
 
-#utHeader[open = "true"]{
+#utHeader #tagUT{
+    max-width: 0px;
+}
+
+#utContent #utHeader #tagUT{
+    max-width: 15px;
+    border-radius: 6px;
+    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
+    /*border: 1px solid silver;*/
+}
+
+
+#utHeader[open = "true"], #utContent #utHeader #tagUT[open = "true"]{
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
+    border: 1px solid silver;
+    border-bottom: none;
 }
 
 
 #utHeader QLabel{
-    color: #4d4d4d;
+    color: #333333;
     font-weight: bold;
     font-size: 16px;
 }
 
-#colorPicker QLabel{
-    color: red;
-    font-weight: bold;
-}
-
-#colorPicker QSpinBox{
-    min-width: 60px;
-}
-
-#colorPicker QPushButton{
-    border:none;
-    background-color: #c8c8c8;
-    height: 16px;
-    padding-top: 3px;
-
-}
 
 #tag QLabel{
     color: white;
@@ -298,41 +300,63 @@ QScrollArea{
     min-height: 20px;
 }
 
-#tag[type = "succeed"], #unitTest[state = "succeed"]{
+#tag[type = "succeed"]{
     background-color: #5DB85B;
 }
 
-#tag[type = "failure"], #unitTest[state = "failure"]{
+#tag[type = "failure"]{
     background-color: #EFAD4D;
 }
 
-#tag[type = "error"], #unitTest[state = "error"]{
+#tag[type = "error"]{
     background-color: #D95350;
+    border-right: 1px solid #acacac;
 }
 
-#tag[type = "untested"], #tag[type = "untested"] QLabel, #unitTest[state = "untested"]{
-    background-color: lightgray;
-    color: black;
+#tag[type = "untested"]{
+    background-color: #9b59b6;
+    border-left: 1px solid #acacac;
 }
 
 #unitTest{
     min-height: 30px;
     border: 1px solid #acacac;
     border-top: none;
+    background-color: white;
     border-bottom: 3px solid qlineargradient(x1:0, y1:0, x2:0 y2:1, stop:0 grey, stop:1 white);
 }
 
-#unitTest[state = "untested"] QLabel{
-    color: black;
-}
-
-#unitTest[state = "selected"]{
-    background-color: #418BCA;
-}
-
 #unitTest QLabel{
-    color: white;
+    color: #333333;
     font-weight: bold;
+}
+
+#unitTest[selected = "True"]{
+    background-color: lightgray;
+}
+
+#unitTest #tagUT{
+    max-width: 15px;
+    border-left: 1px solid #acacac;
+    border-bottom: 3px solid qlineargradient(x1:0, y1:0, x2:0 y2:1, stop:0 grey, stop:1 white);
+}
+
+#tagUT[state = "succeed"]{
+    background: #5DB85B;
+}
+
+#tagUT[state = "failure"]{
+    background: #EFAD4D;
+}
+#tagUT[state = "error"]{
+    background: #D95350;
+}
+#tagUT[state = "untested"]{
+    background: #9b59b6;
+}
+
+#unitTest[selected = "True"]{
+    background-color: #f0960a;
 }
 
 #mantis{

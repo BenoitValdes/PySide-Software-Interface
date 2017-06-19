@@ -9,7 +9,6 @@ class MainWindow(QtGui.QWidget):
         self.setStyleSheet(ui.css)
         # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowTitle('QA Software')
-        # self.move(3200, 658)
         self.resize(800, 500)
 
         # Widgets
@@ -41,8 +40,6 @@ class MainWindow(QtGui.QWidget):
         self.setLayout(self.main_layout)
         self.overlay = ui.Overlay(self)
 
-        # self.colorPicker = ui.ColorPicker(self.placeHolder)
-
         # --- Connections ---------------------------------------------------------------------------------------------
         self.top_menu.menuBtn.clicked.connect(lambda: self.displayMenu(self.left_menu))
         # About search
@@ -52,14 +49,6 @@ class MainWindow(QtGui.QWidget):
         # About menu
         self.left_menu.projectButton.clicked.connect(lambda: self.displayOverlay(self.projectSettings))
         self.left_menu.buildBtn.addBtn.clicked.connect(self.addRev)
-
-        # self.left_menu.buttons[0].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
-        # self.left_menu.buttons[1].clicked.connect(lambda: self.changeContent(placeHolder1))
-        # self.left_menu.buttons[2].clicked.connect(lambda: self.changeContent(placeHolder2))
-
-        # self.left_menu.buttons[0].clicked.connect(lambda: self.changeContent(0))
-        # self.left_menu.buttons[1].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff0000")))
-        # self.left_menu.buttons[2].clicked.connect(lambda: self.displayOverlay(ui.PlaceHolder("ff00FF")))
 
 
     def colorPicker(self):
