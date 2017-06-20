@@ -249,16 +249,12 @@ QScrollArea{
 
 }
 
-#utContent{
-    border: 2px solid #1e1e1e;
 
-}
-
-#utHeader #tagUT{
+#content > #utHeader #tagUT{
     max-width: 0px;
 }
 
-#utContent #utHeader #tagUT{
+#utHeader #tagUT{
     max-width: 15px;
     border-bottom: 2px solid #f0960a;
 }
@@ -274,16 +270,17 @@ QScrollArea{
 #tag QLabel{
     color: white;
     font-weight: bold;
+    background-color: rgba(0, 0, 0, 50);
+    min-height: 20px;
+    padding-top: 5px;
 }
 
 #tag QLabel#value{
-    font-size: 20px;
-    min-height: 20px;
+    font-size: 30px;
+    min-height: 30px;
+    background-color: none;
 }
 
-#tag{
-    width: 100px;
-}
 
 #tag[type = "succeed"]{
     background-color: #638F54;
@@ -302,18 +299,13 @@ QScrollArea{
 }
 
 #unitTest{
-    min-height: 30px;
-    /*border: 1px solid #acacac;*/
+    min-height: 35px;
     border-top: none;
-    /*background-color: white;*/
-    /*border-bottom: 3px solid qlineargradient(x1:0, y1:0, x2:0 y2:1, stop:0 grey, stop:1 white);*/
-}
-
-#unitTest{
-    background-color: #252526;
+    /*margin-left: 50px;*/
+    background-color: #323232;
 }
 #unitTest[alternateRow = "true"]{
-    background-color: #323232;
+    background-color: #252526;
 }
 
 #unitTest QLabel{
@@ -321,11 +313,12 @@ QScrollArea{
     font-weight: bold;
 }
 
-#unitTest[selected = "True"]{
-    background-color: lightgray;
+#unitTest[selected = "True"], #unitTest QLabel[selected = "True"]{
+    background-color: #f0960a;
+    color:black;
 }
 
-#unitTest #tagUT{
+#tagUT{
     max-width: 15px;
 }
 
@@ -340,14 +333,15 @@ QScrollArea{
     background: #D95350;
 }
 
-#unitTest[selected = "True"]{
-    background-color: #f0960a;
-}
-
 #mantis{
     background-color: white;
     border-left: 5px solid #FCBDBD;
     padding-left: 5px;
     padding-top: 2px;
     font-weight: bold;
+}
+
+#tagUT[try = "succeed"]{
+    max-width: 10px;
+    background-color: blue;
 }
