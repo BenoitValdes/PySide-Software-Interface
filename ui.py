@@ -115,7 +115,7 @@ class Tag(QtGui.QFrame):
             self.setProperty("type", "failure")
         if name == "ERROR":
             self.setProperty("type", "error")
-        if name == "UNTESTED":
+        if name == "TESTS":
             self.setProperty("type", "untested")
 
 class ResizableWidget(QtGui.QScrollArea):
@@ -255,9 +255,9 @@ class TopBar(QtGui.QWidget):
         self.setObjectName("topBar")
         self.setAutoFillBackground(True)
 
-        self.menuBtn = IconButton("./icons/bars.png", "ffffff")
+        self.menuBtn = IconButton("./icons/bars.png", "eeeeee")
         self.search = SearchBar()
-        self.settingsBtn = IconButton("./icons/cog.png", "ffffff")
+        self.settingsBtn = IconButton("./icons/cog.png", "eeeeee")
 
         self.setLayout(QtGui.QHBoxLayout())
         self.layout().setContentsMargins(10,0,10,0)
@@ -679,6 +679,11 @@ class UTWidget(PaintedWidget):
         self.mainHeader = UTHeader(self.name+" - Unit Test")
         self.mainContent = UnitTestContent()
         self.mainContent.layout().setContentsMargins(0, 0, 0, 10)
+        self.mainContent.layout().setSpacing(10)
+        self.mainContent.setObjectName("mainUTContent")
+
+        self.mainHeader.run.setText("RUN ALL TESTS")
+        self.mainHeader.run.setFixedWidth(150)
 
         self.categories = []
 
@@ -693,6 +698,7 @@ class UTWidget(PaintedWidget):
             self.mainContent.layout().addWidget(widget)
 
         self.setLayout(QtGui.QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
         self.layout().addWidget(self.mainHeader)
         self.layout().addWidget(self.mainContent)
@@ -726,6 +732,7 @@ class UTHeader(PaintedWidget):
         self.clicked = CustomSignal().clicked
         self.open = False
         self.freeze = False
+
         self.setProperty("open", self.open)
         self.setFixedHeight(int(getCssValue("utHeader", "height")))
 
@@ -784,20 +791,22 @@ class UnitTestContent(PaintedWidget):
         self.visible = False
 
         self.setLayout(QtGui.QVBoxLayout())
-        self.layout().setContentsMargins(0, 0, 0, 10)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
         self.setMaximumHeight(0)
 
         self.tags = {
             "succeed" : Tag("SUCCEED"),
             "failure" : Tag("FAILURE"),
             "error" : Tag("ERROR"),
-            "untested" : Tag("UNTESTED")
+            "untested" : Tag("TESTS")
         }
+
 
         reportLayout = QtGui.QHBoxLayout()
         reportLayout.setSizeConstraint(QtGui.QLayout.SetNoConstraint)
-        reportLayout.setContentsMargins(0, 0, 0, 0)
-        reportLayout.setSpacing(0)
+        reportLayout.setContentsMargins(50, 10, 50, 0)
+        reportLayout.setSpacing(50)
         reportLayout.addWidget(self.tags["untested"])
         reportLayout.addWidget(self.tags["succeed"])
         reportLayout.addWidget(self.tags["failure"])
@@ -816,6 +825,7 @@ class UnitTestContent(PaintedWidget):
 class UnitTestCategory(QtGui.QWidget):
     def __init__(self, infos, parent = None):
         QtGui.QWidget.__init__(self, parent)
+
         self.setLayout(QtGui.QVBoxLayout())
         self.layout().setContentsMargins(10, 0, 10, 0)
         self.layout().setSpacing(0)
@@ -826,15 +836,30 @@ class UnitTestCategory(QtGui.QWidget):
         self.header = UTHeader(infos["name"])
         self.content = UnitTestContent()
 
+        self.utList = QtGui.QListWidget()
+
         self.layout().addWidget(self.header)
         self.layout().addWidget(self.content)
+        self.content.layout().addWidget(self.utList)
 
         self.header.clicked.connect(self.content.changeState)
 
     def addUT(self, state = "untested"):
+        tmpItem = QtGui.QListWidgetItem()
+        alternate = False
+        if len(self.listOfUT) % 2 > 0:
+            alternate = True
         self.content.tags[state].add()
-        self.listOfUT.append(UnitTest(state))
-        self.content.layout().addWidget(self.listOfUT[-1])
+        self.listOfUT.append(UnitTest(state, alternate))
+        self.utList.addItem(tmpItem)
+        self.utList.setItemWidget(tmpItem, self.listOfUT[-1])
+        tmpItem.setSizeHint(self.listOfUT[-1].sizeHint())
+
+        size = 0
+        padding = self.listOfUT[-1].sizeHint().height()
+        for i in range(len(self.listOfUT)):
+            size += padding
+        self.utList.setFixedHeight(size)
 
     def updateSelected(self, widget):
         if widget.selected and not widget in self.selectedUT:
@@ -849,8 +874,14 @@ class UnitTestCategory(QtGui.QWidget):
 
         self.parent().parent().updateSelected(self.header.title.text(), self.selectedUT)
 
+    def paintEvent(self, event):
+        opt = QtGui.QStyleOption()
+        opt.initFrom(self)
+        painter = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtGui.QStyle.PE_Widget, opt, painter, self)
+
 class UnitTest(QtGui.QWidget):
-    def __init__(self, state = "untested"):
+    def __init__(self, state = "untested", alternateRow = True):
         QtGui.QWidget.__init__(self)
         self.setObjectName("unitTest")
         self.state = state
@@ -865,6 +896,7 @@ class UnitTest(QtGui.QWidget):
 
         self.run = FlatButton("RUN")
         self.run.setMaximumWidth(80)
+        self.setProperty("alternateRow", alternateRow)
 
         self.setLayout(QtGui.QHBoxLayout())
         self.layout().setContentsMargins(0, 0, 10, 0)
@@ -878,7 +910,7 @@ class UnitTest(QtGui.QWidget):
         key = QtGui.QApplication.keyboardModifiers()
         if key == QtCore.Qt.ControlModifier:
             self.selected = not self.selected
-            self.parent().parent().updateSelected(self)
+            self.parent().parent().parent().parent().updateSelected(self)
             self.setProperty("selected", str(self.selected))
             self.style().unpolish(self)
             self.style().polish(self)

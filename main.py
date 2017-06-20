@@ -7,15 +7,15 @@ class MainWindow(QtGui.QWidget):
         # Window Config
         self.setObjectName("mainWindow")
         self.setStyleSheet(ui.css)
-        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowTitle('QA Software')
-        self.resize(800, 500)
+        self.resize(1280, 720)
 
         # Widgets
         self.top_menu = ui.TopBar()
         self.left_menu = ui.Menu()
 
-        self.placeHolder = ui.PlaceHolder("e6e6e6")
+        self.placeHolder = ui.PlaceHolder("252526")
         self.content_widget = QtGui.QStackedWidget()
         self.widgets = []
         self.widgets.append(self.placeHolder)
@@ -49,6 +49,8 @@ class MainWindow(QtGui.QWidget):
         # About menu
         self.left_menu.projectButton.clicked.connect(lambda: self.displayOverlay(self.projectSettings))
         self.left_menu.buildBtn.addBtn.clicked.connect(self.addRev)
+
+        self.center()
 
 
     def colorPicker(self):
@@ -111,6 +113,13 @@ class MainWindow(QtGui.QWidget):
     def resizeEvent(self, event):
         self.overlay.resize(event.size())
         event.accept()
+
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtGui.QApplication.desktop().screenNumber(QtGui.QApplication.desktop().cursor().pos())
+        centerPoint = QtGui.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
