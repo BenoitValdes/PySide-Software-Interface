@@ -701,13 +701,15 @@ class UTWidget(PaintedWidget):
 
         # Just for test
         for i in range(10):
-            widget = UnitTestCategory({"name": "Unit Test "+str(i+1)}, self)
+            self.categories.append(UnitTestCategory({"name": "Unit Test "+str(i+1)}, self))
+            widget = self.categories[-1]
             widget.addUT("Unit Test 1", "succeed")
             widget.addUT("Unit Test 2")
             widget.addUT("Unit Test 3", "failure")
             widget.addUT("Unit Test 4", "succeed")
             widget.addUT("Unit Test 5", "error")
             self.mainContent.layout().addWidget(widget)
+            widget.changeState()
 
         self.setLayout(QtGui.QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
@@ -718,6 +720,17 @@ class UTWidget(PaintedWidget):
 
         self.mainContent.changeState()
         self.mainHeader.freeze = True
+
+        for tag in self.mainContent.tags:
+            self.mainContent.tags[tag].clicked.disconnect()
+            self.mainContent.tags[tag].clicked.connect(self.sortCategories)
+
+    def sortCategories(self):
+        # print self.sender().parent.property("type")
+        for widget in self.categories:
+            # widget.changeState()
+            print widget.state
+        pass
 
     def updateSelected(self, catName, content):
         if not content:
@@ -854,6 +867,8 @@ class UnitTestCategory(QtGui.QWidget):
         self.layout().setContentsMargins(10, 0, 10, 0)
         self.layout().setSpacing(0)
 
+        self.state = "untested"
+
         self.selectedUT = []
         self.listOfUT = []
 
@@ -880,6 +895,26 @@ class UnitTestCategory(QtGui.QWidget):
         self.listOfUT.append(UnitTest(name, state, alternate))
         self.content.layout().addWidget(self.listOfUT[-1])
 
+    def changeState(self):
+        newState = ""
+        utState = []
+        for i in range(1, self.content.layout().count()):
+            utState.append(str(self.content.layout().itemAt(i).widget().state))
+
+        if "succeed" in utState:
+            newState = "succeed"
+        if "None" in utState:
+            newState = "untested"
+        if "failure" in utState:
+            newState = "failure"
+        if "error" in utState:
+            newState = "error"
+
+        self.state = newState
+
+        self.header.tag.setProperty("state", newState)
+        self.style().unpolish(self.header.tag)
+        self.style().polish(self.header.tag)
 
     def updateSelected(self, widget):
         if widget.selected and not widget in self.selectedUT:
